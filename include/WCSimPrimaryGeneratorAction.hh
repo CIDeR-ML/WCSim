@@ -11,6 +11,7 @@
 #include "WCSimGenerator_Radioactivity.hh"
 #include "WCSimLIGen.hh"
 #include "WCSimAmBeGen.hh"
+#include "WCSimVoxGen.hh"
 #include "WCSimEnumerations.hh"
 #include "jhfNtuple.h"
 #include "WCSimNuHepMC3Reader.hh"
@@ -96,6 +97,7 @@ private:
 
   // Variables set by the messenger
   G4bool   useAmBeEvt;
+  G4bool   useVoxEvt;
   G4bool   useMulineEvt;
   G4bool   useRootrackerEvt;
   G4bool   useGunEvt;
@@ -119,6 +121,13 @@ private:
 
   // AmBe Generator 
   WCSimAmBeGen* AmBeGen;
+  // Vox Generator
+  WCSimVoxGen* VoxGen;
+  G4int nGamma;
+  G4double rRange[2];
+  G4double phiRange[2];
+  G4double zRange[2];
+  TH1D *hQE_profile = nullptr;
 
   // IBD generator
     // Database for spectra
@@ -228,6 +237,17 @@ private:
 
   inline void SetAmBeEvtGenerator(G4bool choice) { useAmBeEvt = choice; }
   inline G4bool IsUsingAmBeEvtGenerator()  { return useAmBeEvt; }
+
+  inline void SetVoxEvtGenerator(G4bool choice) { useVoxEvt = choice; }
+  inline G4bool IsUsingVoxEvtGenerator()  { return useVoxEvt; }
+  inline void SetVoxnGamma(G4int newvalue) { nGamma = newvalue; }
+  inline void SetVoxr0(G4double r0) { rRange[0] = r0; }
+  inline void SetVoxr1(G4double r1) { rRange[1] = r1; }
+  inline void SetVoxphi0(G4double phi0) { phiRange[0] = phi0; }
+  inline void SetVoxphi1(G4double phi1) { phiRange[1] = phi1; }
+  inline void SetVoxz0(G4double z0) { zRange[0] = z0; }
+  inline void SetVoxz1(G4double z1) { zRange[1] = z1; }
+
 
   inline TFile* GetInputRootrackerFile(){ return fInputRootrackerFile;}
   inline void SetRootrackerEvtGenerator(G4bool choice) { useRootrackerEvt = choice; }

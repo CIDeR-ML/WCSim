@@ -196,6 +196,63 @@ WCSimPrimaryGeneratorMessenger::WCSimPrimaryGeneratorMessenger(WCSimPrimaryGener
   mPMTLEDIdCmd2->SetGuidance("Set LED id for mPMT LED source position, dTheta and dPhi for LED direction. Defaults to 0, 0.0, 0.0 ");
   mPMTLEDIdCmd2->SetParameterName("mPMTLEDId2","mPMTLEDId2_dTheta","mPMTLEDId2_dPhi", true);
   mPMTLEDIdCmd2->SetDefaultValue(G4ThreeVector(0,0.0,0.0));
+
+  nGammaCmd = new G4UIcmdWithAnInteger("/mygen/nGamma_Vox",this);
+  nGammaCmd->SetGuidance("Set the number of gammas you want to generate in a voxel");
+  nGammaCmd->SetGuidance("[usage] /mygen/nGamma_vox ngamma");
+  nGammaCmd->SetGuidance("see data/VoxGen.json for number for now");
+  nGammaCmd->SetGuidance(" nGamma : ngamma (where ngamma is given in json) ");
+  nGammaCmd->SetRange("nGamma>0");
+  nGammaCmd->SetParameterName("nGamma",true);
+  nGammaCmd->SetDefaultValue(1);
+
+  r0Cmd = new G4UIcmdWithADoubleAndUnit("/mygen/r0_Vox",this);
+  r0Cmd->SetGuidance("Set the radius lower limit of the voxel in which the gammas are generated");
+  r0Cmd->SetGuidance("[usage] /mygen/r0_Vox r0 unit");
+  r0Cmd->SetGuidance(" r0 : r0 (where r0 is given in json) ");
+  r0Cmd->SetRange("r0>=0")
+  r0Cmd->SetUnitCategory("Distance");
+  r0Cmd->SetParameterName("r0",true);
+  r0Cmd->SetDefaultValue(0.0*cm);
+
+  r1Cmd = new G4UIcmdWithADoubleAndUnit("/mygen/r1_Vox",this);
+  r1Cmd->SetGuidance("Set the radius upper limit of the voxel in which the gammas are generated");
+  r1Cmd->SetGuidance("[usage] /mygen/r1_Vox r1 unit");
+  r1Cmd->SetGuidance(" r1 : r1 (where r1 is given in json) ");
+  r1Cmd->SetRange("r1>0")
+  r1Cmd->SetUnitCategory("Distance");
+  r1Cmd->SetParameterName("r1",true);
+  r1Cmd->SetDefaultValue(1.0*cm);
+
+  z0Cmd = new G4UIcmdWithADoubleAndUnit("/mygen/z0_Vox",this);
+  z0Cmd->SetGuidance("Set the z lower limit of the voxel in which the gammas are generated");
+  z0Cmd->SetGuidance("[usage] /mygen/z0_Vox z0 unit");
+  z0Cmd->SetGuidance(" z0 : z0 (where z0 is given in json) ");
+  z0Cmd->SetUnitCategory("Distance");
+  z0Cmd->SetParameterName("z0",true);
+  z0Cmd->SetDefaultValue(0.0*cm);
+
+  z1Cmd = new G4UIcmdWithADoubleAndUnit("/mygen/z1_Vox",this);
+  z1Cmd->SetGuidance("Set the z upper limit of the voxel in which the gammas are generated");
+  z1Cmd->SetGuidance("[usage] /mygen/z1_Vox z1 unit");
+  z1Cmd->SetGuidance(" z1 : z1 (where z1 is given in json) ");
+  z1Cmd->SetUnitCategory("Distance");
+  z1Cmd->SetParameterName("z1",true);
+  z1Cmd->SetDefaultValue(1.0*cm);
+
+  phi0Cmd = new G4UIcmdWithADouble("/mygen/phi0_Vox",this);
+  phi0Cmd->SetGuidance("Set the phi lower limit of the voxel in which the gammas are generated");
+  phi0Cmd->SetGuidance("[usage] /mygen/phi0_Vox phi0");
+  phi0Cmd->SetGuidance(" phi0 : phi0 (where phi0 is given in json) ");
+  phi0Cmd->SetParameterName("phi0",true);
+  phi0Cmd->SetDefaultValue(0.0);
+
+  phi1Cmd = new G4UIcmdWithADouble("/mygen/phi1_Vox",this);
+  phi1Cmd->SetGuidance("Set the phi upper limit of the voxel in which the gammas are generated");
+  phi1Cmd->SetGuidance("[usage] /mygen/phi1_Vox phi1");
+  phi1Cmd->SetGuidance(" phi1 : phi1 (where phi1 is given in json) ");
+  phi1Cmd->SetParameterName("phi1",true);
+  phi1Cmd->SetDefaultValue(360.0);
 }
 
 WCSimPrimaryGeneratorMessenger::~WCSimPrimaryGeneratorMessenger()
@@ -217,6 +274,14 @@ WCSimPrimaryGeneratorMessenger::~WCSimPrimaryGeneratorMessenger()
   delete lightInjectorModeCmd;
   delete mPMTLEDIdCmd1;
   delete mPMTLEDIdCmd2;
+
+  delete nGammaCmd;
+  delete r0Cmd;
+  delete r1Cmd;
+  delete phi0Cmd;
+  delete phi1Cmd;
+  delete z0Cmd;
+  delete z1Cmd;
 }
 
 void WCSimPrimaryGeneratorMessenger::SetNewValue(G4UIcommand * command,G4String newValue)
@@ -253,6 +318,24 @@ void WCSimPrimaryGeneratorMessenger::SetNewValue(G4UIcommand * command,G4String 
       myAction->SetGPSEvtGenerator(false);
       myAction->SetIBDEvtGenerator(false);
       myAction->SetHepMC3EvtGenerator(false);
+      myAction->SetDataTableEvtGenerator(false);
+      myAction->SetCosmicsGenerator(false);
+      myAction->SetRadioactiveEvtGenerator(false);
+      myAction->SetRadonEvtGenerator(false);
+      myAction->SetmPMTledEvtGenerator(false);
+    }
+    if (newValue == "voxel")
+    {
+      myAction->SetMulineEvtGenerator(false);
+      myAction->SetAmBeEvtGenerator(false);
+      myAction->SetVoxEvtGenerator(true);
+      myAction->SetGunEvtGenerator(false);
+      myAction->SetRootrackerEvtGenerator(false);
+      myAction->SetLaserEvtGenerator(false);
+      myAction->SetInjectorEvtGenerator(false);
+      myAction->SetLightInjectorEvtGenerator(false);
+      myAction->SetGPSEvtGenerator(false);
+      myAction->SetIBDEvtGenerator(false);
       myAction->SetDataTableEvtGenerator(false);
       myAction->SetCosmicsGenerator(false);
       myAction->SetRadioactiveEvtGenerator(false);
@@ -671,6 +754,40 @@ void WCSimPrimaryGeneratorMessenger::SetNewValue(G4UIcommand * command,G4String 
              << ", dPhi = " << mPMTLEDIdCmd2->GetNew3VectorValue(newValue).z() << " deg" << G4endl;
     }
 
+  if (command==nGammaCmd )
+  {
+    myAction->SetVoxnGamma(nGammaCmd->GetNewIntValue(newValue));
+  }
+
+  if (command==r0Cmd )
+  {
+    myAction->SetVoxr0(r0Cmd->GetNewDoubleValue(newValue));
+  }
+
+  if (command==r1Cmd )
+  {
+    myAction->SetVoxr1(r1Cmd->GetNewDoubleValue(newValue));
+  }
+
+  if (command==phi0Cmd)
+  {
+    myAction->SetVoxphi0(phi0Cmd->GetNewDoubleValue(newValue));
+  }
+
+  if (command==phi1Cmd)
+  {
+    myAction->SetVoxphi1(phi1Cmd->GetNewDoubleValue(newValue));
+  }
+
+  if (command==z0Cmd)
+  {
+    myAction->SetVoxz0(z0Cmd->GetNewDoubleValue(newValue));
+  }
+
+  if (command==z1Cmd)
+  {
+    myAction->SetVoxz1(z1Cmd->GetNewDoubleValue(newValue));
+  }
 }
 
 G4String WCSimPrimaryGeneratorMessenger::GetCurrentValue(G4UIcommand* command)

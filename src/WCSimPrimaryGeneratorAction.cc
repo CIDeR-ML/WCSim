@@ -108,6 +108,7 @@ WCSimPrimaryGeneratorAction::WCSimPrimaryGeneratorAction(
 
   useMulineEvt 		    = true;
   useAmBeEvt          = false;
+  useVoxEvt           = false;
   useRootrackerEvt   	= false;
   useGunEvt    		    = false;
   useLaserEvt  		    = false;
@@ -445,7 +446,26 @@ void WCSimPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
       AmBeGen->GenerateNG(anEvent);
     }
   } 
-  
+  else if(useVoxEvt){ // J.Xia
+
+    // Sample the energy from the energy spectrum
+    gEnergy = VoxGen->GenGammaEnergy();
+
+    if ( !VoxGen ){
+      VoxGen = new WCSimVoxGen(myDetector, nGamma, gEnergy, rRange, phiRange, zRange);
+    }
+
+    if (!myDetector) {
+        G4Exception("WCSimPrimaryGeneratorActino::GeneratePrimaries", "WCSimError", FatalException,
+            "You are trying to run VoxGen without having set the Detector geometry");
+    }
+    else{
+      VoxGen->GenRandomPosition();
+      VoxGen->GenRandomDirection();
+
+      VoxGen->GenerateVox(anEvent);
+    }
+  }
   else if (useRootrackerEvt)
     {
       if ( !fInputRootrackerFile->IsOpen() )
@@ -1685,6 +1705,8 @@ G4String WCSimPrimaryGeneratorAction::GetGeneratorTypeString()
     return "muline";
   else if(useAmBeEvt)
     return "ambeevt";
+  else if(useVoxEvt)
+    return "voxel";
   else if(useGunEvt)
     return "gun";
   else if(useGPSEvt)
