@@ -31,9 +31,8 @@ G4double WCSimVoxGen::gammaSpectrum[21] = { .0787*correctionFactor, .1838*correc
                                             .0220*correctionFactor, .0130*correctionFactor, .0084*correctionFactor};
 G4int    WCSimVoxGen::pdgids = 22;
 
-WCSimVoxGen::WCSimVoxGen(WCSimDetectorConstruction* detector, G4int nGamma, G4double energy, G4double rRange[], G4double phiRange[], G4double zRange[]) :
+WCSimVoxGen::WCSimVoxGen(WCSimDetectorConstruction* detector, G4double energy, G4double rRange[], G4double phiRange[], G4double zRange[]) :
                                            myDetector(detector),
-                                           nGamma(nGamma),
                                            gEnergy(gammaEnergy),
                                            r(rRange),
                                            phi(phiRange),
@@ -97,45 +96,36 @@ G4double WCSimVoxGen::GenGammaEnergy(){
     return energy;
 }
 
-std::vector<G4ThreeVector> WCSimVoxGen::GenRandomPosition(){
-    for (G4int i=0; i<nGamma; i++){
-        // Generate a random position for the particle
-        // (r, phi, z)
-        G4double r = (rRange[1] - rRange[0]) * G4UniformRand() + rRange[0];
-        G4double phi = (phiRange[1] - phiRange[0]) * G4UniformRand() + phiRange[0];
-        G4double z = (zRange[1] - zRange[0]) * G4UniformRand() + zRange[0];
+void WCSimVoxGen::GenRandomPosition(){
+     // Generate a random position for the particle
+     // (r, phi, z)
+     G4double r = (rRange[1] - rRange[0]) * G4UniformRand() + rRange[0];
+     G4double phi = (phiRange[1] - phiRange[0]) * G4UniformRand() + phiRange[0];
+     G4double z = (zRange[1] - zRange[0]) * G4UniformRand() + zRange[0];
 
-        position = G4ThreeVector(r*cos(phi), r*sin(phi), z);
-        if (myDetector->GetIsNuPrism()){
-            position.rotateX(-90.*deg);
-        }
-        pos_vox.push_back(position);
-    }
-
-    return pos_vox;
+     G4ThreeVector position = G4ThreeVector(r*cos(phi), r*sin(phi), z);
+     if (myDetector->GetIsNuPrism()){
+        position.rotateX(-90.*deg);
+     }
 }
 
-std::vector<G4ThreeVector> WCSimVoxGen::GenRandomDirection(){
-    for (G4int i=0; i<nGamma; i++){
-        direction = rGen.fire();
-        if (myDetector->GetIsNuPrism()){
-            direction.rotateX(-90.*deg);
-        }
-        dir_vox.push_back(direction);
-    }
-
-    return dir_vox;
+void WCSimVoxGen::GenRandomDirection(){
+     G4ThreeVector direction = rGen.fire();
+     if (myDetector->GetIsNuPrism()){
+        direction.rotateX(-90.*deg);
+     }
 }
 
 void WCSimVoxGen::GenerateVox(G4Event* anEvent){
     myVoxGun->SetParticleEnergy(gEnergy);
     myVoxGun->SetParticleTime(time);
     myVoxGun->SetParticleDefinition(G4Gamma::Definition());
-    for (G4int iGamma = 0; iGamma < nGamma; iGamma++){
-        // Configure the final properties of the particle
-        myVoxGun->SetParticlePosition(pox_vox[iGamma]);
-        myVoxGun->SetParticleMomentumDirection(dir_vox[iGamma]);
-        // Generate the primary vertex for the particle
-        myVoxGun->GeneratePrimaryVertex(anEvent);
-    }
+
+    GenRandomPosition();
+    GenRandomDirection();
+    // Configure the final properties of the particle
+    myVoxGun->SetParticlePosition(position);
+    myVoxGun->SetParticleMomentumDirection(direction);
+    // Generate the primary vertex for the particle
+    myVoxGun->GeneratePrimaryVertex(anEvent);
 }

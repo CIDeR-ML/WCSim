@@ -452,7 +452,7 @@ void WCSimPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     gEnergy = VoxGen->GenGammaEnergy();
 
     if ( !VoxGen ){
-      VoxGen = new WCSimVoxGen(myDetector, nGamma, gEnergy, rRange, phiRange, zRange);
+      VoxGen = new WCSimVoxGen(myDetector, gEnergy, rRange, phiRange, zRange);
     }
 
     if (!myDetector) {
