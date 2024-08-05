@@ -210,7 +210,7 @@ WCSimPrimaryGeneratorMessenger::WCSimPrimaryGeneratorMessenger(WCSimPrimaryGener
   r0Cmd->SetGuidance("Set the radius lower limit of the voxel in which the gammas are generated");
   r0Cmd->SetGuidance("[usage] /mygen/r0_Vox r0 unit");
   r0Cmd->SetGuidance(" r0 : r0 (where r0 is given in json) ");
-  r0Cmd->SetRange("r0>=0")
+  r0Cmd->SetRange("r0>=0");
   r0Cmd->SetUnitCategory("Distance");
   r0Cmd->SetParameterName("r0",true);
   r0Cmd->SetDefaultValue(0.0*cm);
@@ -219,7 +219,7 @@ WCSimPrimaryGeneratorMessenger::WCSimPrimaryGeneratorMessenger(WCSimPrimaryGener
   r1Cmd->SetGuidance("Set the radius upper limit of the voxel in which the gammas are generated");
   r1Cmd->SetGuidance("[usage] /mygen/r1_Vox r1 unit");
   r1Cmd->SetGuidance(" r1 : r1 (where r1 is given in json) ");
-  r1Cmd->SetRange("r1>0")
+  r1Cmd->SetRange("r1>0");
   r1Cmd->SetUnitCategory("Distance");
   r1Cmd->SetParameterName("r1",true);
   r1Cmd->SetDefaultValue(1.0*cm);

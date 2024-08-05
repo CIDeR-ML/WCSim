@@ -449,7 +449,7 @@ void WCSimPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   else if(useVoxEvt){ // J.Xia
 
     // Sample the energy from the energy spectrum
-    gEnergy = VoxGen->GenGammaEnergy();
+    G4double gEnergy = VoxGen->GenGammaEnergy();
 
     if ( !VoxGen ){
       VoxGen = new WCSimVoxGen(myDetector, gEnergy, rRange, phiRange, zRange);
