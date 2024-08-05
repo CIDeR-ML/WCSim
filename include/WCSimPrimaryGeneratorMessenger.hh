@@ -53,12 +53,12 @@ class WCSimPrimaryGeneratorMessenger: public G4UImessenger
 
   // J.Xia: addition of voxel events
   G4UIcmdWithAnInteger* nGammaCmd;
-  G4UIcmdWithADoubleAndUnit* r0Cmd;
-  G4UIcmdWithADoubleAndUnit* r1Cmd;
-  G4UIcmdWithADoubleAndUnit* phi0Cmd;
-  G4UIcmdWithADoubleAndUnit* phi1Cmd;
-  G4UIcmdWithADoubleAndUnit* z0Cmd;
-  G4UIcmdWithADoubleAndUnit* z1Cmd;
+  G4UIcmdWithADouble* r0Cmd;
+  G4UIcmdWithADouble* r1Cmd;
+  G4UIcmdWithADouble* phi0Cmd;
+  G4UIcmdWithADouble* phi1Cmd;
+  G4UIcmdWithADouble* z0Cmd;
+  G4UIcmdWithADouble* z1Cmd;
 
   G4UIcmdWithAnInteger* mPMTLEDIdCmd1;
   G4UIcmdWith3Vector* mPMTLEDIdCmd2;
