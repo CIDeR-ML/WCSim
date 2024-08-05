@@ -771,12 +771,12 @@ void WCSimPrimaryGeneratorMessenger::SetNewValue(G4UIcommand * command,G4String 
 
   if (command==phi0Cmd)
   {
-    myAction->SetVoxphi0(phi0Cmd->GetNewDoubleValue(newValue));
+    myAction->SetVoxphi0(phi0Cmd->GetNewDoubleValue(newValue) * 2 * M_PI / 360.0);
   }
 
   if (command==phi1Cmd)
   {
-    myAction->SetVoxphi1(phi1Cmd->GetNewDoubleValue(newValue));
+    myAction->SetVoxphi1(phi1Cmd->GetNewDoubleValue(newValue) * 2 * M_PI / 360.0);
   }
 
   if (command==z0Cmd)
