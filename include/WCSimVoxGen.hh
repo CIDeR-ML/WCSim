@@ -38,7 +38,7 @@ class WCSimVoxGen
 
   private:
     G4ParticleGun*        myVoxGun;
-    G4SPSRandomGenerator* rGen;
+    //G4SPSRandomGenerator* rGen;
     G4SPSEneDistribution* nEnergyDist;
     //G4SPSEneDistribution* nEnergyDistFE;
     //G4SPSEneDistribution* nEnergyDistSE;
@@ -55,7 +55,10 @@ class WCSimVoxGen
     G4ThreeVector direction;
 
     static G4int nGammaOutcomes;
-    static G4double gammaProbabilities[3];
+    static G4double correctionFactor;
+    //static G4double gammaProbabilities[3];
+    static G4double gammaWavelengths[21];
+    static G4double gammaSpectrum[21];
     static G4int pdgids;
     G4double time;
     //G4double epsilon;

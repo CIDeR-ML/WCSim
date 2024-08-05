@@ -31,12 +31,13 @@ G4double WCSimVoxGen::gammaSpectrum[21] = { .0787*correctionFactor, .1838*correc
                                             .0220*correctionFactor, .0130*correctionFactor, .0084*correctionFactor};
 G4int    WCSimVoxGen::pdgids = 22;
 
-WCSimVoxGen::WCSimVoxGen(WCSimDetectorConstruction* detector, G4double energy, G4double rRange[], G4double phiRange[], G4double zRange[]) :
+WCSimVoxGen::WCSimVoxGen(WCSimDetectorConstruction* detector, G4double energy, G4double rinputs[], G4double phiinputs[], G4double zinputs[]) :
                                            myDetector(detector),
-                                           gEnergy(gammaEnergy),
-                                           r(rRange),
-                                           phi(phiRange),
-                                           z(zRange)
+                                           gEnergy(energy),
+                                           rRange({rinputs[0], rinputs[1]}),
+                                           phiRange({phiinputs[0], phiinputs[1]}),
+                                           zRange({zinputs[0], zinputs[1]}),
+{
   wcsimdir = string(getenv("WCSIMDIR_BUILD_DIR"))+"data/";
 
   // Initialise
@@ -47,14 +48,14 @@ WCSimVoxGen::~WCSimVoxGen(){
   
   // This needed to be deleted
   delete myVoxGun;
-  delete rGen;
-  delete nEnergyDistGS;
+  //delete rGen;
+  //delete nEnergyDistGS;
   //delete nEnergyDistFE;
   //delete nEnergyDistSE;
 }
 
 void WCSimVoxGen::Initialise(){
-    rGen          = new G4SPSRandomGenerator();
+    //rGen          = new G4SPSRandomGenerator();
     myVoxGun     = new G4ParticleGun();
 
     //nEnergyDistGS = new G4SPSEneDistribution();
@@ -73,10 +74,10 @@ G4double WCSimVoxGen::GenGammaEnergy(){
     G4double wavelength_binwidth = gammaWavelengths[1] - gammaWavelengths[0];
     G4double hist_binedges[nGammaOutcomes+1];
     for (int i = 0; i < nGammaOutcomes+1; i++){
-        hist_binedges[i] = gammaEnergies[i] - wavelength_binwidth/2.;
+        hist_binedges[i] = gammaWavelengths[i] - wavelength_binwidth/2.;
     }
-    hist_binedges[nGammaOutcomes] = gammaEnergies[nGammaOutcomes-1] + wavelength_binwidth/2.;
-    TH1D hSpectrum = new TH1D("hSpectrum", "hSpectrum", nGammaOutcomes, hist_binedges[0], hist_binedges[nGammaOutcomes]);
+    hist_binedges[nGammaOutcomes] = gammaWavelengths[nGammaOutcomes-1] + wavelength_binwidth/2.;
+    TH1D* hSpectrum = new TH1D("hSpectrum", "hSpectrum", nGammaOutcomes, hist_binedges[0], hist_binedges[nGammaOutcomes]);
     for (int i = 0; i < nGammaOutcomes; i++){
         hSpectrum->SetBinContent(i+1, gammaSpectrum[i]);
     }
@@ -89,7 +90,7 @@ G4double WCSimVoxGen::GenGammaEnergy(){
         prob += hSpectrum->GetBinContent(i+1);
         if (rand < prob){
             G4double rand_lambda = hSpectrum->GetBinWidth(i+1) * G4UniformRand() + hSpectrum->GetBinLowEdge(i+1);
-            energy = 1.24E-3./rand_lambda*MeV;
+            energy = 1.24E-3/rand_lambda*MeV;
             break;
         }
     }
@@ -103,14 +104,26 @@ void WCSimVoxGen::GenRandomPosition(){
      G4double phi = (phiRange[1] - phiRange[0]) * G4UniformRand() + phiRange[0];
      G4double z = (zRange[1] - zRange[0]) * G4UniformRand() + zRange[0];
 
-     G4ThreeVector position = G4ThreeVector(r*cos(phi), r*sin(phi), z);
+     position = G4ThreeVector(r*cos(phi), r*sin(phi), z);
      if (myDetector->GetIsNuPrism()){
         position.rotateX(-90.*deg);
      }
 }
 
 void WCSimVoxGen::GenRandomDirection(){
-     G4ThreeVector direction = rGen.fire();
+  
+     double phi = 2.0 * M_PI * G4UniformRand();
+
+     // Generate random cosine of the polar angle θ in [-1, 1]
+     double cosTheta = 2.0 * G4UniformRand() - 1.0;
+     double sinTheta = std::sqrt(1.0 - cosTheta * cosTheta);
+
+     // Convert to Cartesian coordinates
+     double x = sinTheta * std::cos(phi);
+     double y = sinTheta * std::sin(phi);
+     double z = cosTheta;
+
+     direction = G4ThreeVector(x, y, z);     
      if (myDetector->GetIsNuPrism()){
         direction.rotateX(-90.*deg);
      }
