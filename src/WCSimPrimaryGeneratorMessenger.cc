@@ -219,7 +219,6 @@ WCSimPrimaryGeneratorMessenger::WCSimPrimaryGeneratorMessenger(WCSimPrimaryGener
   r1Cmd->SetGuidance("[usage] /mygen/r1_Vox r1 unit");
   r1Cmd->SetGuidance(" r1 : r1 (where r1 is given in json) ");
   r1Cmd->SetRange("r1>0");
-  r1Cmd->SetUnitCategory("Distance");
   r1Cmd->SetParameterName("r1",true);
   r1Cmd->SetDefaultValue(1.0*cm);
 
@@ -227,7 +226,6 @@ WCSimPrimaryGeneratorMessenger::WCSimPrimaryGeneratorMessenger(WCSimPrimaryGener
   z0Cmd->SetGuidance("Set the z lower limit of the voxel in which the gammas are generated");
   z0Cmd->SetGuidance("[usage] /mygen/z0_Vox z0 unit");
   z0Cmd->SetGuidance(" z0 : z0 (where z0 is given in json) ");
-  z0Cmd->SetUnitCategory("Distance");
   z0Cmd->SetParameterName("z0",true);
   z0Cmd->SetDefaultValue(0.0*cm);
 
@@ -235,7 +233,6 @@ WCSimPrimaryGeneratorMessenger::WCSimPrimaryGeneratorMessenger(WCSimPrimaryGener
   z1Cmd->SetGuidance("Set the z upper limit of the voxel in which the gammas are generated");
   z1Cmd->SetGuidance("[usage] /mygen/z1_Vox z1 unit");
   z1Cmd->SetGuidance(" z1 : z1 (where z1 is given in json) ");
-  z1Cmd->SetUnitCategory("Distance");
   z1Cmd->SetParameterName("z1",true);
   z1Cmd->SetDefaultValue(1.0*cm);
 
