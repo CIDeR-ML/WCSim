@@ -36,7 +36,7 @@ WCSimVoxGen::WCSimVoxGen(WCSimDetectorConstruction* detector, G4double energy, G
                                            gEnergy(energy),
                                            rRange({rinputs[0], rinputs[1]}),
                                            phiRange({phiinputs[0], phiinputs[1]}),
-                                           zRange({zinputs[0], zinputs[1]}),
+                                           zRange({zinputs[0], zinputs[1]})
 {
   wcsimdir = string(getenv("WCSIMDIR_BUILD_DIR"))+"data/";
 
