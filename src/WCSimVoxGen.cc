@@ -51,7 +51,7 @@ WCSimVoxGen::WCSimVoxGen(WCSimDetectorConstruction* detector, G4double energy, G
 
   hSpectrum = new TH1D("hSpectrum", "hSpectrum", nGammaOutcomes, hist_binedges[0], hist_binedges[nGammaOutcomes]);
   for (int i = 0; i < nGammaOutcomes; i++){
-    hSpectrum->SetBinContent(i+1, gammaSpectrum[i]);
+    hSpectrum->SetBinContent(i+1, gammaSpectrum[i] / hSpectrum->GetBinCenter(i+1));
   }
   hSpectrum->Scale(1./hSpectrum->Integral());  
 
