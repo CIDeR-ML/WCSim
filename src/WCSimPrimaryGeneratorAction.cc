@@ -449,21 +449,21 @@ void WCSimPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   else if(useVoxEvt){ // J.Xia
 
     // Sample the energy from the energy spectrum
-    G4double gEnergy = VoxGen->GenGammaEnergy();
-
-    if ( !VoxGen ){
-      VoxGen = new WCSimVoxGen(myDetector, gEnergy, rRange, phiRange, zRange);
-    }
-
+    VoxGen = new WCSimVoxGen(myDetector, 0., rRange, phiRange, zRange);   
+    G4double gEnergy = VoxGen->GenGammaEnergy();    
+    VoxGen->SetGammaEnergy(gEnergy);
     if (!myDetector) {
         G4Exception("WCSimPrimaryGeneratorActino::GeneratePrimaries", "WCSimError", FatalException,
             "You are trying to run VoxGen without having set the Detector geometry");
     }
+    
     else{
-      VoxGen->GenRandomPosition();
-      VoxGen->GenRandomDirection();
-
       VoxGen->GenerateVox(anEvent);
+      SetVtx(VoxGen->GetPrimaryPosition());
+      SetBeamEnergy(gEnergy);
+      SetBeamDir(VoxGen->GetPrimaryDirection());
+      SetBeamPDG(VoxGen->GetPDG());
+
     }
   }
   else if (useRootrackerEvt)

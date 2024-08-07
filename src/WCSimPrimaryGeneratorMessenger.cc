@@ -197,15 +197,6 @@ WCSimPrimaryGeneratorMessenger::WCSimPrimaryGeneratorMessenger(WCSimPrimaryGener
   mPMTLEDIdCmd2->SetParameterName("mPMTLEDId2","mPMTLEDId2_dTheta","mPMTLEDId2_dPhi", true);
   mPMTLEDIdCmd2->SetDefaultValue(G4ThreeVector(0,0.0,0.0));
 
-  nGammaCmd = new G4UIcmdWithAnInteger("/mygen/nGamma_Vox",this);
-  nGammaCmd->SetGuidance("Set the number of gammas you want to generate in a voxel");
-  nGammaCmd->SetGuidance("[usage] /mygen/nGamma_vox ngamma");
-  nGammaCmd->SetGuidance("see data/VoxGen.json for number for now");
-  nGammaCmd->SetGuidance(" nGamma : ngamma (where ngamma is given in json) ");
-  nGammaCmd->SetRange("nGamma>0");
-  nGammaCmd->SetParameterName("nGamma",true);
-  nGammaCmd->SetDefaultValue(1);
-
   r0Cmd = new G4UIcmdWithADouble("/mygen/r0_Vox",this);
   r0Cmd->SetGuidance("Set the radius lower limit of the voxel in which the gammas are generated");
   r0Cmd->SetGuidance("[usage] /mygen/r0_Vox r0 unit");
@@ -271,7 +262,6 @@ WCSimPrimaryGeneratorMessenger::~WCSimPrimaryGeneratorMessenger()
   delete mPMTLEDIdCmd1;
   delete mPMTLEDIdCmd2;
 
-  delete nGammaCmd;
   delete r0Cmd;
   delete r1Cmd;
   delete phi0Cmd;
@@ -749,11 +739,6 @@ void WCSimPrimaryGeneratorMessenger::SetNewValue(G4UIcommand * command,G4String 
              << ", dTheta = " << mPMTLEDIdCmd2->GetNew3VectorValue(newValue).y() << " deg" 
              << ", dPhi = " << mPMTLEDIdCmd2->GetNew3VectorValue(newValue).z() << " deg" << G4endl;
     }
-
-  if (command==nGammaCmd )
-  {
-    myAction->SetVoxnGamma(nGammaCmd->GetNewIntValue(newValue));
-  }
 
   if (command==r0Cmd )
   {

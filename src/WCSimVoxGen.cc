@@ -38,7 +38,22 @@ WCSimVoxGen::WCSimVoxGen(WCSimDetectorConstruction* detector, G4double energy, G
                                            phiRange({phiinputs[0], phiinputs[1]}),
                                            zRange({zinputs[0], zinputs[1]})
 {
-  wcsimdir = string(getenv("WCSIMDIR_BUILD_DIR"))+"data/";
+  wcsimdir = string(getenv("WCSIM_BUILD_DIR"))+"data/";
+  
+  // Create a histogram of the gamma spectrum
+  // find the left and right most bin edges:
+  G4double wavelength_binwidth = gammaWavelengths[1] - gammaWavelengths[0];
+  G4double hist_binedges[nGammaOutcomes+1];
+  for (int i = 0; i < nGammaOutcomes+1; i++){
+    hist_binedges[i] = gammaWavelengths[i] - wavelength_binwidth/2.;
+  }
+  hist_binedges[nGammaOutcomes] = gammaWavelengths[nGammaOutcomes-1] + wavelength_binwidth/2.;
+
+  hSpectrum = new TH1D("hSpectrum", "hSpectrum", nGammaOutcomes, hist_binedges[0], hist_binedges[nGammaOutcomes]);
+  for (int i = 0; i < nGammaOutcomes; i++){
+    hSpectrum->SetBinContent(i+1, gammaSpectrum[i]);
+  }
+  hSpectrum->Scale(1./hSpectrum->Integral());  
 
   // Initialise
   this->Initialise();
@@ -48,6 +63,7 @@ WCSimVoxGen::~WCSimVoxGen(){
   
   // This needed to be deleted
   delete myVoxGun;
+  delete hSpectrum;
   //delete rGen;
   //delete nEnergyDistGS;
   //delete nEnergyDistFE;
@@ -69,21 +85,8 @@ void WCSimVoxGen::Initialise(){
 }
 
 G4double WCSimVoxGen::GenGammaEnergy(){
-    // Create a histogram of the gamma spectrum
-    // find the left and right most bin edges:
-    G4double wavelength_binwidth = gammaWavelengths[1] - gammaWavelengths[0];
-    G4double hist_binedges[nGammaOutcomes+1];
-    for (int i = 0; i < nGammaOutcomes+1; i++){
-        hist_binedges[i] = gammaWavelengths[i] - wavelength_binwidth/2.;
-    }
-    hist_binedges[nGammaOutcomes] = gammaWavelengths[nGammaOutcomes-1] + wavelength_binwidth/2.;
-    TH1D* hSpectrum = new TH1D("hSpectrum", "hSpectrum", nGammaOutcomes, hist_binedges[0], hist_binedges[nGammaOutcomes]);
-    for (int i = 0; i < nGammaOutcomes; i++){
-        hSpectrum->SetBinContent(i+1, gammaSpectrum[i]);
-    }
-    hSpectrum->Scale(1./hSpectrum->Integral());
-    // Generate a random energy from the gamma spectrum
     G4double energy = 0.*MeV;
+    // Generate a random energy from the gamma spectrum
     G4double rand = G4UniformRand();
     G4double prob = 0.;
     for (G4int i = 0; i < nGammaOutcomes; i++){
@@ -100,32 +103,34 @@ G4double WCSimVoxGen::GenGammaEnergy(){
 void WCSimVoxGen::GenRandomPosition(){
      // Generate a random position for the particle
      // (r, phi, z)
-     G4double r = (rRange[1] - rRange[0]) * G4UniformRand() + rRange[0];
-     G4double phi = (phiRange[1] - phiRange[0]) * G4UniformRand() + phiRange[0];
-     G4double z = (zRange[1] - zRange[0]) * G4UniformRand() + zRange[0];
-
-     position = G4ThreeVector(r*cos(phi), r*sin(phi), z);
+     double rand = G4UniformRand();
+     G4double r = (rRange[1] - rRange[0]) * rand + rRange[0];
+     G4double cos_phi_rad = fabs(cos(phiRange[1]) - cos(phiRange[0])) * rand + min(cos(phiRange[0]), cos(phiRange[1])); //already in radians
+     G4double sin_phi_rad = std::sqrt(1.0 - cos_phi_rad * cos_phi_rad);
+     G4double z = (zRange[1] - zRange[0]) * rand + zRange[0];
+     position = G4ThreeVector(r*cos_phi_rad, r*sin_phi_rad, z); // because the rotation later will flip the sign
      if (myDetector->GetIsNuPrism()){
-        position.rotateX(-90.*deg);
+       position.rotateX(-CLHEP::pi / 2);	
      }
 }
 
 void WCSimVoxGen::GenRandomDirection(){
-  
-     double phi = 2.0 * M_PI * G4UniformRand();
+     double rand = G4UniformRand();
+     double phi = 2.0 * CLHEP::pi * rand;
 
      // Generate random cosine of the polar angle θ in [-1, 1]
-     double cosTheta = 2.0 * G4UniformRand() - 1.0;
+     double cosTheta = 2.0 * rand - 1.0;
      double sinTheta = std::sqrt(1.0 - cosTheta * cosTheta);
 
      // Convert to Cartesian coordinates
      double x = sinTheta * std::cos(phi);
-     double y = sinTheta * std::sin(phi);
+     double y = sinTheta * std::sin(phi); // because the rotation later will flip the sign
      double z = cosTheta;
 
-     direction = G4ThreeVector(x, y, z);     
+     direction = G4ThreeVector(x, y, z);
+     
      if (myDetector->GetIsNuPrism()){
-        direction.rotateX(-90.*deg);
+       direction.rotateX(-CLHEP::pi / 2);
      }
 }
 

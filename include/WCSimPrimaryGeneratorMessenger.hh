@@ -52,7 +52,6 @@ class WCSimPrimaryGeneratorMessenger: public G4UImessenger
   G4UIcmdWithADouble* injectorWavelengthCmd;
 
   // J.Xia: addition of voxel events
-  G4UIcmdWithAnInteger* nGammaCmd;
   G4UIcmdWithADouble* r0Cmd;
   G4UIcmdWithADouble* r1Cmd;
   G4UIcmdWithADouble* phi0Cmd;

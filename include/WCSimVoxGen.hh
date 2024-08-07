@@ -11,6 +11,7 @@
 #include "jhfNtuple.h"
 #include <fstream>
 
+#include "TH1D.h"
 #include <vector>
 
 using namespace std;
@@ -35,6 +36,10 @@ class WCSimVoxGen
     void GenRandomPosition();
     void GenRandomDirection();
     G4double GenGammaEnergy();
+    void SetGammaEnergy(G4double energy){gEnergy = energy;}
+    G4ThreeVector GetPrimaryPosition(){ return position; }
+    G4ThreeVector GetPrimaryDirection(){ return direction; }
+    G4int GetPDG(){ return pdgids; }
 
   private:
     G4ParticleGun*        myVoxGun;
@@ -67,6 +72,8 @@ class WCSimVoxGen
     // Variables for reading in the file
     /// Points to $WCSIM_BUILD_DIR/data/
     string wcsimdir;
+
+    TH1D* hSpectrum;
 
 };
 
