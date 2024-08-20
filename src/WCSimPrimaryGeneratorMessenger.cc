@@ -225,7 +225,7 @@ WCSimPrimaryGeneratorMessenger::WCSimPrimaryGeneratorMessenger(WCSimPrimaryGener
   z1Cmd->SetGuidance("[usage] /mygen/z1_Vox z1 cm");
   z1Cmd->SetGuidance(" z1 : z1 (where z1 is given in json) ");
   z1Cmd->SetParameterName("z1",true);
-  z1Cmd->SetDefaultValue(1.0*CLHEP::cm
+  z1Cmd->SetDefaultValue(1.0*CLHEP::cm)
 
   phi0Cmd = new G4UIcmdWithADouble("/mygen/phi0_Vox",this);
   phi0Cmd->SetGuidance("Set the phi lower limit of the voxel in which the gammas are generated");
