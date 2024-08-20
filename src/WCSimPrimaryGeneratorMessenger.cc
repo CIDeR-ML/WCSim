@@ -199,33 +199,33 @@ WCSimPrimaryGeneratorMessenger::WCSimPrimaryGeneratorMessenger(WCSimPrimaryGener
 
   r0Cmd = new G4UIcmdWithADouble("/mygen/r0_Vox",this);
   r0Cmd->SetGuidance("Set the radius lower limit of the voxel in which the gammas are generated");
-  r0Cmd->SetGuidance("[usage] /mygen/r0_Vox r0 unit");
+  r0Cmd->SetGuidance("[usage] /mygen/r0_Vox r0 cm");
   r0Cmd->SetGuidance(" r0 : r0 (where r0 is given in json) ");
   r0Cmd->SetRange("r0>=0");
   r0Cmd->SetParameterName("r0",true);
-  r0Cmd->SetDefaultValue(0.0);
+  r0Cmd->SetDefaultValue(0.0*CLHEP::cm);
 
   r1Cmd = new G4UIcmdWithADouble("/mygen/r1_Vox",this);
   r1Cmd->SetGuidance("Set the radius upper limit of the voxel in which the gammas are generated");
-  r1Cmd->SetGuidance("[usage] /mygen/r1_Vox r1 unit");
+  r1Cmd->SetGuidance("[usage] /mygen/r1_Vox r1 mm");
   r1Cmd->SetGuidance(" r1 : r1 (where r1 is given in json) ");
   r1Cmd->SetRange("r1>0");
   r1Cmd->SetParameterName("r1",true);
-  r1Cmd->SetDefaultValue(1.0);
+  r1Cmd->SetDefaultValue(1.0*CLHEP::cm);
 
   z0Cmd = new G4UIcmdWithADouble("/mygen/z0_Vox",this);
   z0Cmd->SetGuidance("Set the z lower limit of the voxel in which the gammas are generated");
-  z0Cmd->SetGuidance("[usage] /mygen/z0_Vox z0 unit");
+  z0Cmd->SetGuidance("[usage] /mygen/z0_Vox z0 cm");
   z0Cmd->SetGuidance(" z0 : z0 (where z0 is given in json) ");
   z0Cmd->SetParameterName("z0",true);
-  z0Cmd->SetDefaultValue(0.0);
+  z0Cmd->SetDefaultValue(0.0*CLHEP::cm);
 
   z1Cmd = new G4UIcmdWithADouble("/mygen/z1_Vox",this);
   z1Cmd->SetGuidance("Set the z upper limit of the voxel in which the gammas are generated");
-  z1Cmd->SetGuidance("[usage] /mygen/z1_Vox z1 unit");
+  z1Cmd->SetGuidance("[usage] /mygen/z1_Vox z1 cm");
   z1Cmd->SetGuidance(" z1 : z1 (where z1 is given in json) ");
   z1Cmd->SetParameterName("z1",true);
-  z1Cmd->SetDefaultValue(1.0);
+  z1Cmd->SetDefaultValue(1.0*CLHEP::cm
 
   phi0Cmd = new G4UIcmdWithADouble("/mygen/phi0_Vox",this);
   phi0Cmd->SetGuidance("Set the phi lower limit of the voxel in which the gammas are generated");
