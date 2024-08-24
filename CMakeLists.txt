@@ -257,7 +257,7 @@ include_directories (
 )
 
 add_subdirectory (src)
-
+add_subdirectory (app)
 
 #########
 # Configure package and final installation files
