@@ -14,7 +14,7 @@
 #include "G4RandomTools.hh" // For random number generation
 
 #include "TH1D.h"
-
+#include "TSpline.h"
 #include <vector>
 #include <cmath>
 #include <random>
@@ -30,6 +30,8 @@ G4double WCSimVoxGen::gammaSpectrum[21] = { .0787*correctionFactor, .1838*correc
                                             .1033*correctionFactor, .0727*correctionFactor, .0587*correctionFactor, .0470*correctionFactor, .0372*correctionFactor, .0285*correctionFactor,
                                             .0220*correctionFactor, .0130*correctionFactor, .0084*correctionFactor};
 
+G4double WCSimVoxGen::wavelength_binwidth = WCSimVoxGen::gammaWavelengths[1] - WCSimVoxGen::gammaWavelengths[0];
+
 //only considered gamma for now - J.Xia, Aug 24, 2024
 G4int    WCSimVoxGen::pdgids = 22;
 
@@ -44,8 +46,6 @@ WCSimVoxGen::WCSimVoxGen(WCSimDetectorConstruction* detector, G4double energy, G
   
   // Create a histogram of the gamma spectrum
   // find the left and right most bin edges:
-  G4double wavelength_binwidth = gammaWavelengths[1] - gammaWavelengths[0];
-  G4double hist_binedges[nGammaOutcomes+1];
   for (int i = 0; i < nGammaOutcomes+1; i++){
     hist_binedges[i] = gammaWavelengths[i] - wavelength_binwidth/2.;
   }
@@ -57,7 +57,7 @@ WCSimVoxGen::WCSimVoxGen(WCSimDetectorConstruction* detector, G4double energy, G
   }
   hSpectrum->Scale(1./hSpectrum->Integral());
   hSpectrum->SetDirectory(0);
-  
+  spline = new TSpline3(hSpectrum);
   // Initialise
   this->Initialise();
 }
@@ -67,6 +67,7 @@ WCSimVoxGen::~WCSimVoxGen(){
   // This needed to be deleted
   delete myVoxGun;
   delete hSpectrum;
+  delete spline;
 }
 
 void WCSimVoxGen::Initialise(){
@@ -79,11 +80,15 @@ G4double WCSimVoxGen::GenGammaEnergy(){
     // Generate a random energy from the gamma spectrum
     G4double rand = G4UniformRand();
     G4double prob = 0.;
-    for (G4int i = 0; i < nGammaOutcomes; i++){
-        prob += hSpectrum->GetBinContent(i+1);
+    G4double spec_range = hist_binedges[nGammaOutcomes] - hist_binedges[0];
+    G4int nstep = 500;
+    for (G4int i = 0; i < nstep; i++){
+        G4double curr_lambda = hist_binedges[0]+i*spec_range/nstep;
+        prob += spline->Eval(curr_lambda);
         if (rand < prob){
-            G4double rand_lambda = hSpectrum->GetBinWidth(i+1) * G4UniformRand() + hSpectrum->GetBinLowEdge(i+1);
-            energy = 1.24E-3/rand_lambda*MeV;
+	  //G4double rand_lambda = hSpectrum->GetBinWidth(i+1) * G4UniformRand() + hSpectrum->GetBinLowEdge(i+1);
+	  //energy = 1.24E-3/rand_lambda*MeV;
+  	    energy = 1.24E-3/curr_lambda*MeV;
             break;
         }
     }

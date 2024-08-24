@@ -12,6 +12,7 @@
 #include <fstream>
 
 #include "TH1D.h"
+#include "TSpline.h"
 #include <vector>
 
 using namespace std;
@@ -66,16 +67,18 @@ class WCSimVoxGen
     static G4double gammaWavelengths[21];
     static G4double gammaSpectrum[21];
     static G4int pdgids;
-    G4double time;
+    static G4double wavelength_binwidth;
+
+    G4double hist_binedges[22];
     //G4double epsilon;
     //G4double BGOX, BGOY, BGOZ;
-
+    G4double time;
     // Variables for reading in the file
     /// Points to $WCSIM_BUILD_DIR/data/
     string wcsimdir;
 
     TH1D* hSpectrum;
-
+    TSpline3* spline;
 };
 
 #endif
