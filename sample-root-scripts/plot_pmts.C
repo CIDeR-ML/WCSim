@@ -1,3 +1,4 @@
+R__LOAD_LIBRARY($WCSIM_BUILD_DIR/lib/libWCSimRoot.so)
 #include <iostream>
 #include <stdio.h>     
 #include <stdlib.h>
