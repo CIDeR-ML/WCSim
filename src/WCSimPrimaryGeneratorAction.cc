@@ -463,7 +463,6 @@ void WCSimPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
       SetBeamEnergy(gEnergy);
       SetBeamDir(VoxGen->GetPrimaryDirection());
       SetBeamPDG(VoxGen->GetPDG());
-
     }
   }
   else if (useRootrackerEvt)

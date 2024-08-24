@@ -29,6 +29,8 @@ G4double WCSimVoxGen::gammaSpectrum[21] = { .0787*correctionFactor, .1838*correc
                                             .2593*correctionFactor, .2472*correctionFactor, .2276*correctionFactor, .1970*correctionFactor,  .1777*correctionFactor, .1547*correctionFactor,
                                             .1033*correctionFactor, .0727*correctionFactor, .0587*correctionFactor, .0470*correctionFactor, .0372*correctionFactor, .0285*correctionFactor,
                                             .0220*correctionFactor, .0130*correctionFactor, .0084*correctionFactor};
+
+//only considered gamma for now - J.Xia, Aug 24, 2024
 G4int    WCSimVoxGen::pdgids = 22;
 
 WCSimVoxGen::WCSimVoxGen(WCSimDetectorConstruction* detector, G4double energy, G4double rinputs[], G4double phiinputs[], G4double zinputs[]) :
@@ -53,8 +55,9 @@ WCSimVoxGen::WCSimVoxGen(WCSimDetectorConstruction* detector, G4double energy, G
   for (int i = 0; i < nGammaOutcomes; i++){
     hSpectrum->SetBinContent(i+1, gammaSpectrum[i] / hSpectrum->GetBinCenter(i+1));
   }
-  hSpectrum->Scale(1./hSpectrum->Integral());  
-
+  hSpectrum->Scale(1./hSpectrum->Integral());
+  hSpectrum->SetDirectory(0);
+  
   // Initialise
   this->Initialise();
 }
@@ -64,24 +67,11 @@ WCSimVoxGen::~WCSimVoxGen(){
   // This needed to be deleted
   delete myVoxGun;
   delete hSpectrum;
-  //delete rGen;
-  //delete nEnergyDistGS;
-  //delete nEnergyDistFE;
-  //delete nEnergyDistSE;
 }
 
 void WCSimVoxGen::Initialise(){
-    //rGen          = new G4SPSRandomGenerator();
     myVoxGun     = new G4ParticleGun();
-
-    //nEnergyDistGS = new G4SPSEneDistribution();
-    //nEnergyDistGS->SetEnergyDisType("Arb");
-    //nEnergyDistGS->ArbEnergyHistoFile(gs_path);
-    //nEnergyDistGS->ArbInterpolate("Lin");
-    //nEnergyDistGS->SetBiasRndm(rGen);
-
     time = 0.;
-    //epsilon = 1e-6;
 }
 
 G4double WCSimVoxGen::GenGammaEnergy(){

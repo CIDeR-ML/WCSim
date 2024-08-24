@@ -40,6 +40,7 @@ class WCSimVoxGen
     G4ThreeVector GetPrimaryPosition(){ return position; }
     G4ThreeVector GetPrimaryDirection(){ return direction; }
     G4int GetPDG(){ return pdgids; }
+    TH1D* GethSpectrum(){return hSpectrum;}
 
   private:
     G4ParticleGun*        myVoxGun;
