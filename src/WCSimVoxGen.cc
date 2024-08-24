@@ -21,14 +21,11 @@
 
 using namespace std;
 
-G4int    WCSimVoxGen::nGammaOutcomes = 21;
+G4int    WCSimVoxGen::nGammaOutcomes = 23;
 //copied from WCTE mPMT QE-wavelength table in WCSimPMTObject.cc
-G4double WCSimVoxGen::gammaWavelengths[21] = { 300., 320., 340., 360., 380., 400., 420., 440., 460., 480., 500., 520., 540., 560., 580., 600., 620., 640., 660., 680., 700.};
+G4double WCSimVoxGen::gammaWavelengths[23] = { 280., 300., 320., 340., 360., 380., 400., 420., 440., 460., 480., 500., 520., 540., 560., 580., 600., 620., 640., 660., 680., 700., 720.};
 G4double WCSimVoxGen::correctionFactor = 1.0;
-G4double WCSimVoxGen::gammaSpectrum[21] = { .0787*correctionFactor, .1838*correctionFactor, .2401*correctionFactor, .2521*correctionFactor, .2695*correctionFactor, .2676*correctionFactor,
-                                            .2593*correctionFactor, .2472*correctionFactor, .2276*correctionFactor, .1970*correctionFactor,  .1777*correctionFactor, .1547*correctionFactor,
-                                            .1033*correctionFactor, .0727*correctionFactor, .0587*correctionFactor, .0470*correctionFactor, .0372*correctionFactor, .0285*correctionFactor,
-                                            .0220*correctionFactor, .0130*correctionFactor, .0084*correctionFactor};
+G4double WCSimVoxGen::gammaSpectrum[23] = { 0., .0787*correctionFactor, .1838*correctionFactor, .2401*correctionFactor, .2521*correctionFactor, .2695*correctionFactor, .2676*correctionFactor, .2593*correctionFactor, .2472*correctionFactor, .2276*correctionFactor, .1970*correctionFactor,  .1777*correctionFactor, .1547*correctionFactor, .1033*correctionFactor, .0727*correctionFactor, .0587*correctionFactor, .0470*correctionFactor, .0372*correctionFactor, .0285*correctionFactor, .0220*correctionFactor, .0130*correctionFactor, .0084*correctionFactor, 0.};
 
 G4double WCSimVoxGen::wavelength_binwidth = WCSimVoxGen::gammaWavelengths[1] - WCSimVoxGen::gammaWavelengths[0];
 
@@ -55,9 +52,9 @@ WCSimVoxGen::WCSimVoxGen(WCSimDetectorConstruction* detector, G4double energy, G
   for (int i = 0; i < nGammaOutcomes; i++){
     hSpectrum->SetBinContent(i+1, gammaSpectrum[i] / hSpectrum->GetBinCenter(i+1));
   }
-  hSpectrum->Scale(1./hSpectrum->Integral());
+  hSpectrum->Scale(1./hSpectrum->Integral("width"));
   hSpectrum->SetDirectory(0);
-  spline = new TSpline3(hSpectrum);
+  spline = new TSpline3(hSpectrum,"",hist_binedges[0], hist_binedges[nGammaOutcomes]);
   // Initialise
   this->Initialise();
 }
@@ -81,17 +78,22 @@ G4double WCSimVoxGen::GenGammaEnergy(){
     G4double rand = G4UniformRand();
     G4double prob = 0.;
     G4double spec_range = hist_binedges[nGammaOutcomes] - hist_binedges[0];
-    G4int nstep = 500;
-    for (G4int i = 0; i < nstep; i++){
-        G4double curr_lambda = hist_binedges[0]+i*spec_range/nstep;
-        prob += spline->Eval(curr_lambda);
+    G4int nstep = 200;
+    G4double curr_lambda = hist_binedges[0];
+    for (G4int i = 0; i < nstep; i++){      
+	G4double prob_density = spline->Eval(curr_lambda) > 0 ? spline->Eval(curr_lambda) : 0;
+        //prob += prob_density*(spec_range/(G4double)nstep)/wavelength_binwidth*(G4double)nGammaOutcomes/nstep;
+	prob += prob_density*(spec_range/(G4double)nstep) ;
         if (rand < prob){
-	  //G4double rand_lambda = hSpectrum->GetBinWidth(i+1) * G4UniformRand() + hSpectrum->GetBinLowEdge(i+1);
-	  //energy = 1.24E-3/rand_lambda*MeV;
   	    energy = 1.24E-3/curr_lambda*MeV;
             break;
         }
+	curr_lambda += spec_range/(G4double)nstep;
     }
+    if (energy == 0*MeV){
+      energy  = 1.24E-3/hist_binedges[nGammaOutcomes]*MeV;
+    }
+    
     return energy;
 }
 

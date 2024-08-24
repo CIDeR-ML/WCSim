@@ -64,12 +64,12 @@ class WCSimVoxGen
     static G4int nGammaOutcomes;
     static G4double correctionFactor;
     //static G4double gammaProbabilities[3];
-    static G4double gammaWavelengths[21];
-    static G4double gammaSpectrum[21];
+    static G4double gammaWavelengths[23];
+    static G4double gammaSpectrum[23];
     static G4int pdgids;
     static G4double wavelength_binwidth;
 
-    G4double hist_binedges[22];
+    G4double hist_binedges[24];
     //G4double epsilon;
     //G4double BGOX, BGOY, BGOZ;
     G4double time;
