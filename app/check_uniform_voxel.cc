@@ -118,7 +118,7 @@ void Load_Voxel_Definition(const char* filename){
       variables[key] = std::stod(value);      
     } else {
       std::cerr << "Invalid line format: " << line << std::endl;
-    }f
+    }
   }
   
   voxfile.close();
@@ -263,8 +263,7 @@ int main(int argc, char *argv[])
     // Now look at the Cherenkov hits
     
     int ncherenkovhits     = wcsimrootevent->GetNcherenkovhits();
-    int ncherenkovdigihits = wcsimrootevent->GetNcherenkovdigihits(); 
-    
+
     if(verbose){
       cout << "RAW HITS:" << endl;
       printf("Number of PMTs with a true hit %d\n",     ncherenkovhits);
