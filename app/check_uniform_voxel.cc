@@ -17,7 +17,6 @@
 #include "TSpline.h"
 
 #include "WCSimRootOptions.hh"
-//#include "WCSimRootGeom.hh"
 #include "WCSimRootEvent.hh"
 #include "G4ThreeVector.hh"
 
@@ -119,7 +118,7 @@ void Load_Voxel_Definition(const char* filename){
       variables[key] = std::stod(value);      
     } else {
       std::cerr << "Invalid line format: " << line << std::endl;
-    }
+    }f
   }
   
   voxfile.close();
@@ -190,7 +189,7 @@ int main(int argc, char *argv[])
   }
 
   std::vector<double> vec_r;
-  std::vector<double> vec_cosp;
+  std::vector<double> vec_phi;
   std::vector<double> vec_z;
   std::vector<double> vec_dirp;
   std::vector<double> vec_cosz;
@@ -221,17 +220,18 @@ int main(int argc, char *argv[])
     // Read the event from the tree into the WCSimRootEvent instance
     tree->GetEntry(ievent);      
     wcsimrootevent = wcsimrootsuperevent->GetTrigger(0);
-    //setvtx in wcsim converts mm to cm, so an offset of 10
-    double VtxX = wcsimrootevent->GetVtx(0)*10.;
-    double VtxY = wcsimrootevent->GetVtx(1)*10.;
-    double VtxZ = wcsimrootevent->GetVtx(2)*10.;
+    //setvtx in wcsim converts assumes mm
+    //weird coordinates to match the WCSim convention
+    double VtxX = wcsimrootevent->GetVtx(0);
+    double VtxY = -wcsimrootevent->GetVtx(2);
+    double VtxZ = wcsimrootevent->GetVtx(1);
 
-    double R = sqrt(VtxX*VtxX + VtxZ*VtxZ);
-    double cosPhi = VtxX/R;
+    double R = sqrt(VtxX*VtxX + VtxY*VtxY);
+    double Phi = std::atan2(VtxY, VtxX);
 
     vec_r.push_back(R);
-    vec_cosp.push_back(cosPhi);
-    vec_z.push_back(VtxY);
+    vec_phi.push_back(Phi);
+    vec_z.push_back(VtxZ);
     
     // Now read the tracks in the event
     // Loop through elements in the TClonesArray of WCSimTracks
@@ -248,7 +248,7 @@ int main(int argc, char *argv[])
 
       G4ThreeVector dir = G4ThreeVector(dirX, -dirZ, dirY);
       double cosZ = std::cos(dir.theta());
-      double dirP = dir.phi()*360./2/TMath::Pi() + 180.;
+      double dirP = dir.phi()*180./TMath::Pi() + 180.;
       
       double eventE = wcsimroottrack->GetE();
       double lambda = 1.240E-3/eventE;
@@ -287,7 +287,7 @@ int main(int argc, char *argv[])
   else{
     check_values["E_spectrum"] = 1. - ComputeKLDivergence(hlambda, hSpec);
     check_values["vtx_r"] = KS_test(vec_r, variables["r0"], variables["r1"]);
-    check_values["vtx_cosphi"] = KS_test(vec_cosp, variables["phi0"], variables["phi1"]);
+    check_values["vtx_phi"] = KS_test(vec_phi, variables["phi0"], variables["phi1"]);
     check_values["vtx_z"] = KS_test(vec_z, variables["z0"], variables["z1"]);
     check_values["dirphi"] = KS_test(vec_dirp, 0., 360.);
     check_values["cosz"] = KS_test(vec_cosz, -1., 1.);        

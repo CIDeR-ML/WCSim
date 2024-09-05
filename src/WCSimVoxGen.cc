@@ -101,9 +101,10 @@ void WCSimVoxGen::GenRandomPosition(){
      // Generate a random position for the particle
      // (r, phi, z)
      double rand = G4UniformRand();
+     double phi = min(phiRange[0], phiRange[1]) + fabs(phiRange[1] - phiRange[0]) * rand;
      G4double r = (rRange[1] - rRange[0]) * rand + rRange[0];
-     G4double cos_phi_rad = fabs(cos(phiRange[1]) - cos(phiRange[0])) * rand + min(cos(phiRange[0]), cos(phiRange[1])); //already in radians
-     G4double sin_phi_rad = std::sqrt(1.0 - cos_phi_rad * cos_phi_rad);
+     G4double cos_phi_rad = std::cos(phi); //already in radians
+     G4double sin_phi_rad = std::sin(phi);
      G4double z = (zRange[1] - zRange[0]) * rand + zRange[0];
      position = G4ThreeVector(r*cos_phi_rad, r*sin_phi_rad, z); // because the rotation later will flip the sign
      if (myDetector->GetIsNuPrism()){
