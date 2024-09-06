@@ -108,9 +108,7 @@ void Load_Voxel_Definition(const char* filename){
       
       // Optionally trim trailing whitespace from value
       value = value.substr(0, value.find_last_not_of(" \t") + 1);
-      
-      //std::cout << "Key: '" << key << "'" << std::endl;
-      //std::cout << "Value: '" << value << "'" << std::endl;
+
       if (std::find(keys.begin(), keys.end(), key) == keys.end()){
 	cerr << "Given key " << key << " does not exist in the list nor match with the names. Please check input config macros." << endl;
 	exit(-99);
@@ -162,6 +160,12 @@ int main(int argc, char *argv[])
       continue;
     }
 
+    if(((strcmp(argv[i],"-q")==0) || strcmp(argv[i], "--quiet") == 0)  && i<argc){
+      i++;
+      skip_plotting = 1;
+      break;
+    }
+
     if(((strcmp(argv[i],"-h")==0) || strcmp(argv[i], "--help") == 0)  && i<argc){
       i++;
       print_usage = 1;      
@@ -181,19 +185,23 @@ int main(int argc, char *argv[])
   TH1D *hlambda = (TH1D*)hSpec->Clone();
   hlambda->SetDirectory(0);
   hlambda->Clear();
-  
-  TH1D *h_r   = new TH1D("r", "r", 30, variables["r0"], variables["r1"]);
-  TH1D *h_phi = new TH1D("phi", "phi", 30, variables["phi0"], variables["phi1"]);
-  TH1D *h_z =   new TH1D("z", "z", 30, variables["z0"], variables["z1"]);
-  TH2D *h_dir = new TH2D("dir", "dir", 36, 0, 360, 10, 0, 1);  
-  
+
+  if (!skip_plotting){
+    hVox[0]   = new TH1D("r", "r", 30, variables["r0"], variables["r1"]);
+    hVox[1]   = new TH1D("phi", "phi", 30, variables["phi0"], variables["phi1"]);
+    hVox[2]   = new TH1D("z", "z", 30, variables["z0"], variables["z1"]);
+    hDir      = new TH2D("dir", "dir", 36, 0, 360., 20, -1, 1.);
+    hDir->SetDirectory(0);
+    for (int i = 0; i < 3; i++){
+        hVox[i]->SetDirectory(0);
+    }
+  }
   // Open the file
   TFile * file = new TFile(rootfilename,"read");
   if (!file->IsOpen()){
     std::cout << "Error, could not open input file: " << rootfilename << std::endl;
     return -1;
   }
-
   std::vector<double> vec_r;
   std::vector<double> vec_phi;
   std::vector<double> vec_z;
@@ -242,9 +250,11 @@ int main(int argc, char *argv[])
     vec_phi.push_back(Phi);
     vec_z.push_back(VtxZ);
 
-    h_r->Fill(R);
-    h_phi->Fill(Phi);
-    h_z->Fill(VtxZ);
+    if (!skip_plotting){
+      hVox[0]->Fill(R);
+      hVox[1]->Fill(Phi);
+      hVox[2]->Fill(VtxZ);
+    }
     
     // Now read the tracks in the event
     // Loop through elements in the TClonesArray of WCSimTracks
@@ -271,8 +281,10 @@ int main(int argc, char *argv[])
       vec_dirp.push_back(dirP);
       vec_cosz.push_back(cosZ);
 
-      h_dir->Fill(dirP, cosZ);
-	
+      if (!skip_plotting){
+        hDir->Fill(dirP, cosZ);
+      }
+
     }  // itrack // End of loop over tracks
 
     // Now look at the Cherenkov hits
@@ -315,35 +327,41 @@ int main(int argc, char *argv[])
       return output;
     }    
   }
-  
-  TCanvas *c = new TCanvas("c","",1200,800);
-  c->Divide(3,2);
-  c->cd(1);
-  hlambda->SetLineColor(2);
-  hlambda->Draw("hist");
-  hSpec->Draw("same hist");
-  TSpline3* spline = new TSpline3(hSpec,"", hist_binedges[0], hist_binedges[23]);
-  spline->SetLineColor(6);
-  spline->Draw("same");
-  //c->SetLogy(1);
 
-  c->cd(2);
-  h_r->Draw();
-  c->cd(3);
-  h_phi->Draw();
-  c->cd(4);
-  h_z->Draw();
-  c->cd(5);
-  h_dir->Draw("colz");    
-  c->Modified();
-  c->Update();
-  c->Print("test_uniformity.png");
-  
+  if (!skip_plotting){
+
+    TCanvas *c = new TCanvas("c","",1200,800);
+    c->Divide(3,2);
+    c->cd(1);
+    hlambda->SetLineColor(2);
+    hlambda->Draw("hist");
+    hlambda->GetXaxis()->SetTitle("Wavelength (nm)");
+    hSpec->Draw("same hist");
+    TSpline3* spline = new TSpline3(hSpec,"", hist_binedges[0], hist_binedges[23]);
+    spline->SetLineColor(6);
+    spline->Draw("same");
+
+    for (int i = 0; i < 3; i++){
+        c->cd(i+2);
+        hVox[i]->Draw();
+        hVox[i]->GetXaxis()->SetTitle(hVox[i]->GetName());
+    }
+
+    c->cd(5);
+    hDir->Draw("colz");
+    hDir->GetXaxis()->SetTitle("Phi (degrees)");
+    hDir->GetYaxis()->SetTitle("cos(Theta)");
+    c->Modified();
+    c->Update();
+    c->Print("test_uniformity.png");
+  }
+
   delete hSpec;
   delete hlambda;
-  delete h_r;
-  delete h_phi;
-  delete h_z;
-  delete h_dir;
+  for (int i = 0; i < 3; i++){
+    delete hVox[i];
+  }
+  delete hVox;
+  delete hDir;
   return output;
 }

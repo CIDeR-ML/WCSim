@@ -27,7 +27,10 @@ char* voxdefname;
 int verbose = 0;
 int all_Chi2 = 0;
 int print_usage = 0;
+int skip_plotting = 0;
 TH1D* hSpec;
+TH1D* hVox[3];
+TH2D* hDir;
 
 std::vector<string> keys = {"r0", "r1", "phi0", "phi1", "z0", "z1", "criterion"};
 std::unordered_map<std::string, double> variables;
