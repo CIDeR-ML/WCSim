@@ -1396,7 +1396,7 @@ void WCSimDetectorConstruction::SetNuPrismBeamTest_16cShort_mPMTGeometry()
 
 	//mPMT params go first because detector depends on it:
 	// mPMT_vessel_cyl_height = 38.*CLHEP::mm;    //option A, option B would be 277 mm
-  mPMT_vessel_cyl_height = 77.785*2*CLHEP::mm; // from actual mPMT measurement
+    mPMT_vessel_cyl_height = 77.785*2*CLHEP::mm; // from actual mPMT measurement
 	mPMT_vessel_radius_curv = 342.*CLHEP::mm;  //needs to include the vessel thickness, as we construct from outside inwards.
 	mPMT_vessel_radius = 254.*CLHEP::mm;
 	dist_pmt_vessel = 8*CLHEP::mm;      

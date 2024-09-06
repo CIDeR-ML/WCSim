@@ -100,12 +100,11 @@ G4double WCSimVoxGen::GenGammaEnergy(){
 void WCSimVoxGen::GenRandomPosition(){
      // Generate a random position for the particle
      // (r, phi, z)
-     double rand = G4UniformRand();
-     double phi = min(phiRange[0], phiRange[1]) + fabs(phiRange[1] - phiRange[0]) * rand;
-     G4double r = (rRange[1] - rRange[0]) * rand + rRange[0];
+     double phi = min(phiRange[0], phiRange[1]) + fabs(phiRange[1] - phiRange[0]) * G4UniformRand();
+     G4double r = (rRange[1] - rRange[0]) * G4UniformRand() + rRange[0];
      G4double cos_phi_rad = std::cos(phi); //already in radians
      G4double sin_phi_rad = std::sin(phi);
-     G4double z = (zRange[1] - zRange[0]) * rand + zRange[0];
+     G4double z = (zRange[1] - zRange[0]) * G4UniformRand() + zRange[0];
      position = G4ThreeVector(r*cos_phi_rad, r*sin_phi_rad, z); // because the rotation later will flip the sign
      if (myDetector->GetIsNuPrism()){
        position.rotateX(-CLHEP::pi / 2);	
@@ -113,11 +112,10 @@ void WCSimVoxGen::GenRandomPosition(){
 }
 
 void WCSimVoxGen::GenRandomDirection(){
-     double rand = G4UniformRand();
-     double phi = 2.0 * CLHEP::pi * rand;
+     double phi = 2.0 * CLHEP::pi * G4UniformRand();
 
      // Generate random cosine of the polar angle θ in [-1, 1]
-     double cosTheta = 2.0 * rand - 1.0;
+     double cosTheta = 2.0 * G4UniformRand() - 1.0;
      double sinTheta = std::sqrt(1.0 - cosTheta * cosTheta);
 
      // Convert to Cartesian coordinates
