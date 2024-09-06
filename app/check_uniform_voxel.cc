@@ -11,6 +11,7 @@
 
 #include "TTree.h"
 #include "TH1D.h"
+#include "TH2D.h"
 #include "TFile.h"
 #include "TMath.h"
 #include "TCanvas.h"
@@ -180,7 +181,12 @@ int main(int argc, char *argv[])
   TH1D *hlambda = (TH1D*)hSpec->Clone();
   hlambda->SetDirectory(0);
   hlambda->Clear();
-    
+  
+  TH1D *h_r   = new TH1D("r", "r", 30, variables["r0"], variables["r1"]);
+  TH1D *h_phi = new TH1D("phi", "phi", 30, variables["phi0"], variables["phi1"]);
+  TH1D *h_z =   new TH1D("z", "z", 30, variables["z0"], variables["z1"]);
+  TH2D *h_dir = new TH2D("dir", "dir", 36, 0, 360, 10, 0, 1);  
+  
   // Open the file
   TFile * file = new TFile(rootfilename,"read");
   if (!file->IsOpen()){
@@ -222,16 +228,23 @@ int main(int argc, char *argv[])
     wcsimrootevent = wcsimrootsuperevent->GetTrigger(0);
     //setvtx in wcsim converts assumes mm
     //weird coordinates to match the WCSim convention
-    double VtxX = wcsimrootevent->GetVtx(0);
-    double VtxY = -wcsimrootevent->GetVtx(2);
-    double VtxZ = wcsimrootevent->GetVtx(1);
+    double VtxX = wcsimrootevent->GetVtx(0)*10;
+    double VtxY = -wcsimrootevent->GetVtx(2)*10;
+    double VtxZ = wcsimrootevent->GetVtx(1)*10;
 
     double R = sqrt(VtxX*VtxX + VtxY*VtxY);
-    double Phi = std::atan2(VtxY, VtxX);
-
+    double Phi = std::atan2(VtxY, VtxX)*180./TMath::Pi();
+    if (Phi < 0){
+      Phi += 360.;
+    }
+    
     vec_r.push_back(R);
     vec_phi.push_back(Phi);
     vec_z.push_back(VtxZ);
+
+    h_r->Fill(R);
+    h_phi->Fill(Phi);
+    h_z->Fill(VtxZ);
     
     // Now read the tracks in the event
     // Loop through elements in the TClonesArray of WCSimTracks
@@ -257,6 +270,8 @@ int main(int argc, char *argv[])
 
       vec_dirp.push_back(dirP);
       vec_cosz.push_back(cosZ);
+
+      h_dir->Fill(dirP, cosZ);
 	
     }  // itrack // End of loop over tracks
 
@@ -300,9 +315,10 @@ int main(int argc, char *argv[])
       return output;
     }    
   }
-  /*
-  TCanvas *c = new TCanvas("c","",800,800);
-  c->cd();
+  
+  TCanvas *c = new TCanvas("c","",1200,800);
+  c->Divide(3,2);
+  c->cd(1);
   hlambda->SetLineColor(2);
   hlambda->Draw("hist");
   hSpec->Draw("same hist");
@@ -310,11 +326,24 @@ int main(int argc, char *argv[])
   spline->SetLineColor(6);
   spline->Draw("same");
   //c->SetLogy(1);
+
+  c->cd(2);
+  h_r->Draw();
+  c->cd(3);
+  h_phi->Draw();
+  c->cd(4);
+  h_z->Draw();
+  c->cd(5);
+  h_dir->Draw("colz");    
   c->Modified();
   c->Update();
-  c->Print("test_hSpec_hlambda.png");
-  */
+  c->Print("test_uniformity.png");
+  
   delete hSpec;
   delete hlambda;
+  delete h_r;
+  delete h_phi;
+  delete h_z;
+  delete h_dir;
   return output;
 }
