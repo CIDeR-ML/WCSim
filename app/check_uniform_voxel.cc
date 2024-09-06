@@ -359,9 +359,11 @@ int main(int argc, char *argv[])
   delete hSpec;
   delete hlambda;
   for (int i = 0; i < 3; i++){
-    delete hVox[i];
+    if (hVox[i] != nullptr){
+      delete hVox[i];
+      hVox[i] = nullptr;
+    }
   }
-  delete hVox;
   delete hDir;
   return output;
 }
