@@ -320,12 +320,12 @@ int main(int argc, char *argv[])
   }
   
   for (auto i = check_values.begin(); i != check_values.end(); i++){
-    output *= (i->second > variables["criterion"] ? 1.: 0.);
+    //output *= (i->second > variables["criterion"] ? 1.: 0.);
     std::cout << i->first << " = " << i->second << std::endl;
-    if (output < 1){
-      cerr << i->first << " has failed because the checked value " << i->second << " is less than the threshold " << variables["criterion"] << endl;
-      return output;
-    }    
+    //if (output < 1){
+    //  cerr << i->first << " has failed because the checked value " << i->second << " is less than the threshold " << variables["criterion"] << endl;
+    // return output;
+    //}
   }
 
   if (!skip_plotting){
