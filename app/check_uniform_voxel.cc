@@ -187,9 +187,9 @@ int main(int argc, char *argv[])
   hlambda->Clear();
 
   if (!skip_plotting){
-    hVox[0]   = new TH1D("r", "r", 30, variables["r0"], variables["r1"]);
-    hVox[1]   = new TH1D("phi", "phi", 30, variables["phi0"], variables["phi1"]);
-    hVox[2]   = new TH1D("z", "z", 30, variables["z0"], variables["z1"]);
+    hVox[0]   = new TH1D("r", "r", 20, variables["r0"]-10., variables["r1"]+10.);
+    hVox[1]   = new TH1D("phi", "phi", 20, variables["phi0"]-5., variables["phi1"]+5.);
+    hVox[2]   = new TH1D("z", "z", 20, variables["z0"]-10., variables["z1"]+10.);
     hDir      = new TH2D("dir", "dir", 36, 0, 360., 20, -1, 1.);
     hDir->SetDirectory(0);
     for (int i = 0; i < 3; i++){
