@@ -49,3 +49,5 @@ double gammaSpectrum[23] = { 0., .0787*correctionFactor, .1838*correctionFactor,
 
 double wavelength_binwidth = gammaWavelengths[1] - gammaWavelengths[0];
 double hist_binedges[24];
+
+std::string wrapup_file;

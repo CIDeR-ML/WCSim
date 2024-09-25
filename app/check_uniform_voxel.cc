@@ -113,8 +113,13 @@ void Load_Voxel_Definition(const char* filename){
 	    cerr << "Given key " << key << " does not exist in the list nor match with the names. Please check input config macros." << endl;
 	    exit(-99);
       }
+      if (key != 'wrapup_file'){
+        variables[key] = std::stod(value);
+      }
+      else{
+        wrapup_file = value;
+      }
 
-      variables[key] = std::stod(value);      
     } else {
       std::cerr << "Invalid line format: " << line << std::endl;
     }
@@ -215,7 +220,7 @@ int main(int argc, char *argv[])
   const long nevent = tree->GetEntries();
   if(verbose) printf("Number of Event Tree Entries: %ld\n",nevent);
   ofstream fout;
-  fout.open(Form("./%s", variables['wrapup_file']),std::ios_base::app);
+  fout.open(Form("./%s",wrapup_file),std::ios_base::app);
   fout << "NEventsOutput: " << nevent << std::endl;
   fout.close();
   
