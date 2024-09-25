@@ -110,8 +110,8 @@ void Load_Voxel_Definition(const char* filename){
       value = value.substr(0, value.find_last_not_of(" \t") + 1);
 
       if (std::find(keys.begin(), keys.end(), key) == keys.end()){
-	cerr << "Given key " << key << " does not exist in the list nor match with the names. Please check input config macros." << endl;
-	exit(-99);
+	    cerr << "Given key " << key << " does not exist in the list nor match with the names. Please check input config macros." << endl;
+	    exit(-99);
       }
 
       variables[key] = std::stod(value);      
@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
       if(voxdefname!=NULL) delete[] voxdefname;
       voxdefname = new char[strlen(argv[i])+1];
       strcpy(voxdefname,argv[i]);
-      std::cout<<"Read in config file for voxel defination: "<<voxdefname<<std::endl;
+      std::cout<<"Read in config file for voxel definition and configs: "<<voxdefname<<std::endl;
       continue;
     }
 
@@ -214,6 +214,10 @@ int main(int argc, char *argv[])
   // Get the number of events
   const long nevent = tree->GetEntries();
   if(verbose) printf("Number of Event Tree Entries: %ld\n",nevent);
+  ofstream fout;
+  fout.open(Form("./%s", variables['wrapup_file']),std::ios_base::app);
+  fout << "NEventsOutput: " << nevent << std::endl;
+  fout.close();
   
   // Create a WCSimRootEvent to put stuff from the tree in
   WCSimRootEvent* wcsimrootsuperevent = new WCSimRootEvent();
