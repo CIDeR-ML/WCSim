@@ -293,7 +293,7 @@ int main(int argc, char *argv[])
       double cosZ = std::cos(dir.theta());
       double dirP = dir.phi()*180./TMath::Pi() + 180.;
       
-      double eventE = wcsimroottrack->GetE();
+      double eventE = wcsimroottrack->GetE()/1.E+6; // eV to MeV
       double lambda = 1.240E-3/eventE;
 
       hlambda->Fill(lambda);
