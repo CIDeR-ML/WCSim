@@ -73,6 +73,7 @@ void WCSimVoxGen::Initialise(){
 }
 
 G4double WCSimVoxGen::GenGammaEnergy(){
+    // default is in eV
     G4double energy = 0.;
     // Generate a random energy from the gamma spectrum
     G4double rand = G4UniformRand();
