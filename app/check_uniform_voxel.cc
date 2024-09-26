@@ -1,8 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <filesystem>
-#include <stdio.h>     
+#include <stdio.h>
 #include <stdlib.h>
 #include <cstdlib>
 #include <vector>
@@ -220,7 +219,8 @@ int main(int argc, char *argv[])
   // Get the number of events
   const long nevent = tree->GetEntries();
   if(verbose) printf("Number of Event Tree Entries: %ld\n",nevent);
-  if (std::filesystem::exists(wrapup_file)){
+  std::ifstream infile(wrapup_file);
+  if (infile.good()){
       ofstream fout;
       fout.open(wrapup_file,std::ios_base::app);
       if (fout.is_open()){
