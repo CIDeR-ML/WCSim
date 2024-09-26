@@ -113,7 +113,7 @@ void Load_Voxel_Definition(const char* filename){
 	    cerr << "Given key " << key << " does not exist in the list nor match with the names. Please check input config macros." << endl;
 	    exit(-99);
       }
-      if (key != 'wrapup_file'){
+      if (key != "wrapup_file"){
         variables[key] = std::stod(value);
       }
       else{
