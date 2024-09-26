@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <filesystem>
 #include <stdio.h>     
 #include <stdlib.h>
 #include <cstdlib>
@@ -219,10 +220,20 @@ int main(int argc, char *argv[])
   // Get the number of events
   const long nevent = tree->GetEntries();
   if(verbose) printf("Number of Event Tree Entries: %ld\n",nevent);
-  ofstream fout;
-  fout.open(Form("./%s",wrapup_file),std::ios_base::app);
-  fout << "NEventsOutput: " << nevent << std::endl;
-  fout.close();
+  if (std::filesystem::exists(wrapup_file)){
+      ofstream fout;
+      fout.open(wrapup_file,std::ios_base::app);
+      if (fout.is_open()){
+         fout << std::endl << "NEventsOutput: " << nevent << std::endl;
+         fout.close();
+      }
+      else{
+         cerr << "Failed to open wrapup file: " << wrapup_file << endl;
+      }
+  }
+  else{
+      cerr << "Wrapup file does not exist: " << wrapup_file << endl;
+  }
   
   // Create a WCSimRootEvent to put stuff from the tree in
   WCSimRootEvent* wcsimrootsuperevent = new WCSimRootEvent();
