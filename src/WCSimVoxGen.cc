@@ -73,7 +73,7 @@ void WCSimVoxGen::Initialise(){
 }
 
 G4double WCSimVoxGen::GenGammaEnergy(){
-    G4double energy = 0.*eV;
+    G4double energy = 0.;
     // Generate a random energy from the gamma spectrum
     G4double rand = G4UniformRand();
     G4double prob = 0.;
@@ -85,13 +85,13 @@ G4double WCSimVoxGen::GenGammaEnergy(){
         //prob += prob_density*(spec_range/(G4double)nstep)/wavelength_binwidth*(G4double)nGammaOutcomes/nstep;
 	prob += prob_density*(spec_range/(G4double)nstep) ;
         if (rand < prob){
-  	    energy = 1.24E-3/curr_lambda*1.E+6*eV;
+  	    energy = 1239.8/curr_lambda;
             break;
         }
 	curr_lambda += spec_range/(G4double)nstep;
     }
-    if (energy == 0*eV){
-      energy  = 1.24E-3/hist_binedges[nGammaOutcomes]*1.E+6*eV;
+    if (energy == 0.){
+      energy  = 1239.8/hist_binedges[nGammaOutcomes];
     }
     
     return energy;
@@ -137,6 +137,7 @@ void WCSimVoxGen::GenerateVox(G4Event* anEvent){
 
     GenRandomPosition();
     GenRandomDirection();
+
     // Configure the final properties of the particle
     myVoxGun->SetParticlePosition(position);
     myVoxGun->SetParticleMomentumDirection(direction);
