@@ -23,7 +23,7 @@ class G4Event;
 class WCSimVoxGen
 {
   public:
-    WCSimVoxGen(WCSimDetectorConstruction* detector, G4double energy, G4double rRange[], G4double phiRange[], G4double zRange[]);
+    WCSimVoxGen(WCSimDetectorConstruction* detector, G4double energy, G4int nphotons, G4double rRange[], G4double phiRange[], G4double zRange[]);
     ~WCSimVoxGen();
 
     // Initialise the AmBe generator
@@ -37,6 +37,8 @@ class WCSimVoxGen
     void GenRandomPosition();
     void GenRandomDirection();
     G4double GenGammaEnergy();
+    void SetNPhotonsPerEvent(G4int nPhotons);
+
     void SetGammaEnergy(G4double energy){gEnergy = energy;}
     G4ThreeVector GetPrimaryPosition(){ return position; }
     G4ThreeVector GetPrimaryDirection(){ return direction; }
@@ -53,6 +55,7 @@ class WCSimVoxGen
     
     // Variables for the initialisation of Vox generator parameters
     G4double gEnergy;
+    G4int nPhotons;
     // ranges of the voxels in the cylindrical coordinate system
     G4double rRange[2];
     G4double phiRange[2];

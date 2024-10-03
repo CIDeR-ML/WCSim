@@ -26,6 +26,8 @@
 // #define HYPER_VERBOSITY
 #endif
 
+//#define DEBUG
+
 // *******************************************
 // BASE CLASS
 // *******************************************
@@ -211,10 +213,11 @@ WCSimWCDigitizerSKI::~WCSimWCDigitizerSKI(){
 
 void WCSimWCDigitizerSKI::DigitizeHits(WCSimWCDigitsCollection* WCHCPMT) {
 
+#ifdef DEBUG
   if(detectorElement=="tank") G4cout << "TANK 20in # ";
   if(detectorElement=="tankPMT2") G4cout << "TANK mPMT # ";
   if(detectorElement=="OD")   G4cout << "OD # ";
-#ifdef WCSIMWCDIGITIZER_VERBOSE
+//#ifdef WCSIMWCDIGITIZER_VERBOSE
   G4cout << "WCSimWCDigitizerSKI::DigitizeHits START WCHCPMT->entries() = " << WCHCPMT->entries() << " hits" << G4endl;
 #endif
 
@@ -425,7 +428,8 @@ void WCSimWCDigitizerSKI::DigitizeHits(WCSimWCDigitsCollection* WCHCPMT) {
 	}//ip (totalpe)
 	absoluteindex+=(*WCHCPMT)[i]->GetTotalPe();
     }//i (WCHCPMT->entries())
-#ifdef WCSIMWCDIGITIZER_VERBOSE
+//#ifdef WCSIMWCDIGITIZER_VERBOSE
+#ifdef DEBUG
   G4cout<<"WCSimWCDigitizerSKI::DigitizeHits END DigiStore->entries() " << DigiStore->entries() << " digits" << G4endl;
 #endif
   //******************************************************************************************************** TD 2019.07.16 : to take PMT saturation effect into account *********************

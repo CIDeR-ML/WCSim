@@ -123,7 +123,7 @@ private:
   WCSimAmBeGen* AmBeGen;
   // Vox Generator
   WCSimVoxGen* VoxGen;
-  G4int nGamma;
+  G4int nOptPhotons;
   G4double rRange[2];
   G4double phiRange[2];
   G4double zRange[2];
@@ -240,7 +240,7 @@ private:
 
   inline void SetVoxEvtGenerator(G4bool choice) { useVoxEvt = choice; }
   inline G4bool IsUsingVoxEvtGenerator()  { return useVoxEvt; }
-  inline void SetVoxnGamma(G4int newvalue) { nGamma = newvalue; }
+  inline void SetNPhotons(G4int newvalue) { nOptPhotons = newvalue; }
   inline void SetVoxr0(G4double r0) { rRange[0] = r0; }
   inline void SetVoxr1(G4double r1) { rRange[1] = r1; }
   inline void SetVoxphi0(G4double phi0) { phiRange[0] = phi0; }

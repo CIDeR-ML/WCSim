@@ -197,6 +197,14 @@ WCSimPrimaryGeneratorMessenger::WCSimPrimaryGeneratorMessenger(WCSimPrimaryGener
   mPMTLEDIdCmd2->SetParameterName("mPMTLEDId2","mPMTLEDId2_dTheta","mPMTLEDId2_dPhi", true);
   mPMTLEDIdCmd2->SetDefaultValue(G4ThreeVector(0,0.0,0.0));
 
+  nOptPhotonsCmd = new G4UIcmdWithAnInteger("/mygen/noptphotons",this);
+  nOptPhotonsCmd->SetGuidance("Set the number of photons to be generated per event");
+  nOptPhotonsCmd->SetGuidance("[usage] /mygen/noptphotons noptphotons");
+  nOptPhotonsCmd->SetGuidance(" noptphotons : 1000 ");
+  nOptPhotonsCmd->SetRange("noptphotons>0");
+  nOptPhotonsCmd->SetParameterName("noptphotons",true);
+  nOptPhotonsCmd->SetDefaultValue(1);
+
   r0Cmd = new G4UIcmdWithADouble("/mygen/r0_Vox",this);
   r0Cmd->SetGuidance("Set the radius lower limit of the voxel in which the gammas are generated");
   r0Cmd->SetGuidance("[usage] /mygen/r0_Vox r0 cm");
@@ -262,6 +270,7 @@ WCSimPrimaryGeneratorMessenger::~WCSimPrimaryGeneratorMessenger()
   delete mPMTLEDIdCmd1;
   delete mPMTLEDIdCmd2;
 
+  delete nOptPhotonsCmd;
   delete r0Cmd;
   delete r1Cmd;
   delete phi0Cmd;
@@ -739,6 +748,11 @@ void WCSimPrimaryGeneratorMessenger::SetNewValue(G4UIcommand * command,G4String 
              << ", dTheta = " << mPMTLEDIdCmd2->GetNew3VectorValue(newValue).y() << " deg" 
              << ", dPhi = " << mPMTLEDIdCmd2->GetNew3VectorValue(newValue).z() << " deg" << G4endl;
     }
+
+  if (command==nOptPhotonsCmd)
+  {
+     myAction->SetNPhotons(nOptPhotonsCmd->GetNewIntValue(newValue));
+  }
 
   if (command==r0Cmd )
   {

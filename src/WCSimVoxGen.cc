@@ -6,11 +6,13 @@
 #include "G4PhysicalConstants.hh"
 #include "G4RandomDirection.hh"
 #include "G4SystemOfUnits.hh"
+#include "G4UnitsTable.hh"
 #include "G4SPSEneDistribution.hh"
 #include "G4SPSRandomGenerator.hh"
 #include "G4ParticleTable.hh"
 #include "G4Neutron.hh"
 #include "G4Gamma.hh"
+#include "G4OpticalPhoton.hh"
 #include "G4RandomTools.hh" // For random number generation
 
 #include "TH1D.h"
@@ -32,9 +34,10 @@ G4double WCSimVoxGen::wavelength_binwidth = WCSimVoxGen::gammaWavelengths[1] - W
 //only considered gamma for now - J.Xia, Aug 24, 2024
 G4int    WCSimVoxGen::pdgids = 22;
 
-WCSimVoxGen::WCSimVoxGen(WCSimDetectorConstruction* detector, G4double energy, G4double rinputs[], G4double phiinputs[], G4double zinputs[]) :
+WCSimVoxGen::WCSimVoxGen(WCSimDetectorConstruction* detector, G4double energy, G4int nphotons, G4double rinputs[], G4double phiinputs[], G4double zinputs[]) :
                                            myDetector(detector),
                                            gEnergy(energy),
+                                           nPhotons(nphotons),
                                            rRange({rinputs[0], rinputs[1]}),
                                            phiRange({phiinputs[0], phiinputs[1]}),
                                            zRange({zinputs[0], zinputs[1]})
@@ -74,7 +77,7 @@ void WCSimVoxGen::Initialise(){
 
 G4double WCSimVoxGen::GenGammaEnergy(){
     // default is in eV
-    G4double energy = 0.;
+    G4double energy = 0.*eV;
     // Generate a random energy from the gamma spectrum
     G4double rand = G4UniformRand();
     G4double prob = 0.;
@@ -86,13 +89,13 @@ G4double WCSimVoxGen::GenGammaEnergy(){
         //prob += prob_density*(spec_range/(G4double)nstep)/wavelength_binwidth*(G4double)nGammaOutcomes/nstep;
 	prob += prob_density*(spec_range/(G4double)nstep) ;
         if (rand < prob){
-  	    energy = 1239.8/curr_lambda;
+  	    energy = 1239.8/curr_lambda*eV;
             break;
         }
 	curr_lambda += spec_range/(G4double)nstep;
     }
     if (energy == 0.){
-      energy  = 1239.8/hist_binedges[nGammaOutcomes];
+      energy  = 1239.8/hist_binedges[nGammaOutcomes]*eV;
     }
     
     return energy;
@@ -132,9 +135,12 @@ void WCSimVoxGen::GenRandomDirection(){
 }
 
 void WCSimVoxGen::GenerateVox(G4Event* anEvent){
+    //std::cout << "Energy: " << G4BestUnit(gEnergy, "Energy") << std::endl;
     myVoxGun->SetParticleEnergy(gEnergy);
     myVoxGun->SetParticleTime(time);
-    myVoxGun->SetParticleDefinition(G4Gamma::Definition());
+    myVoxGun->SetParticleDefinition(G4OpticalPhoton::Definition());
+    //std::cout << "Number of photons: " << nPhotons << std::endl;
+    myVoxGun->SetNumberOfParticles(nPhotons);
 
     GenRandomPosition();
     GenRandomDirection();

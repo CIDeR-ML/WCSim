@@ -39,6 +39,7 @@ WCSimRunActionMessenger::WCSimRunActionMessenger(WCSimRunAction* WCSimRA)
   UseTimer->SetGuidance("Use a timer for runtime");
   UseTimer->SetParameterName("UseTimer",true);
   UseTimer->SetDefaultValue(false);
+
 }
 
 WCSimRunActionMessenger::~WCSimRunActionMessenger()

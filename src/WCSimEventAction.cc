@@ -235,8 +235,12 @@ void WCSimEventAction::BeginOfEventAction(const G4Event*)
     //G4DigiManager* DMman = G4DigiManager::GetDMpointer();
 
   }
-  G4cout << "Starting event " << fEvNum << G4endl;
 
+//#ifdef DEBUG
+  if (fEvNum % 1000 == 0) {
+    G4cout << "Starting event " << fEvNum << G4endl;
+  }
+//#endif
 }
 
 void WCSimEventAction::EndOfEventAction(const G4Event* evt)
@@ -298,8 +302,10 @@ void WCSimEventAction::EndOfEventAction(const G4Event* evt)
     G4String name =   WCIDCollectionName;
     G4int collectionID = SDman->GetCollectionID(name);
     if(collectionID>-1) WCHC = (WCSimWCHitsCollection*)HCE->GetHC(collectionID);
+#ifdef DEBUG
     G4cout << "WCSimEventAction::EndOfEventAction ☆ (WCSimWCHitsCollection*)" << WCIDCollectionName
            << " has " << WCHC->entries() << " entries (hit PMTs)" << G4endl;
+#endif
   }
 
   //B.Q for the hybrid version
@@ -1015,7 +1021,9 @@ void WCSimEventAction::EndOfEventAction(const G4Event* evt)
 
     SavedOptions = true;
   }
+#ifdef DEBUG
   G4cout << "End of event " << fEvNum << G4endl << G4endl;
+#endif
   fEvNum++;
 }
 
