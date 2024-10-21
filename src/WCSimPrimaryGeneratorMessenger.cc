@@ -197,6 +197,14 @@ WCSimPrimaryGeneratorMessenger::WCSimPrimaryGeneratorMessenger(WCSimPrimaryGener
   mPMTLEDIdCmd2->SetParameterName("mPMTLEDId2","mPMTLEDId2_dTheta","mPMTLEDId2_dPhi", true);
   mPMTLEDIdCmd2->SetDefaultValue(G4ThreeVector(0,0.0,0.0));
 
+  nSubEventsCmd = new G4UIcmdWithAnInteger("/mygen/nsubevents",this);
+  nSubEventsCmd->SetGuidance("Set the number of events to be generated per beam");
+  nSubEventsCmd->SetGuidance("[usage] /mygen/nsubevents nsubevents");
+  nSubEventsCmd->SetGuidance(" nsubevents : 1000 ");
+  nSubEventsCmd->SetRange("nsubevents>0");
+  nSubEventsCmd->SetParameterName("nsubevents",true);
+  nSubEventsCmd->SetDefaultValue(1);
+
   nOptPhotonsCmd = new G4UIcmdWithAnInteger("/mygen/noptphotons",this);
   nOptPhotonsCmd->SetGuidance("Set the number of photons to be generated per event");
   nOptPhotonsCmd->SetGuidance("[usage] /mygen/noptphotons noptphotons");
@@ -206,7 +214,7 @@ WCSimPrimaryGeneratorMessenger::WCSimPrimaryGeneratorMessenger(WCSimPrimaryGener
   nOptPhotonsCmd->SetDefaultValue(1);
 
   r0Cmd = new G4UIcmdWithADouble("/mygen/r0_Vox",this);
-  r0Cmd->SetGuidance("Set the radius lower limit of the voxel in which the gammas are generated");
+  r0Cmd->SetGuidance("Set the radius lower limit of the voxel in which the photons are generated");
   r0Cmd->SetGuidance("[usage] /mygen/r0_Vox r0 cm");
   r0Cmd->SetGuidance(" r0 : r0 (where r0 is given in json) ");
   r0Cmd->SetRange("r0>=0");
@@ -214,7 +222,7 @@ WCSimPrimaryGeneratorMessenger::WCSimPrimaryGeneratorMessenger(WCSimPrimaryGener
   r0Cmd->SetDefaultValue(0.0*CLHEP::mm);
 
   r1Cmd = new G4UIcmdWithADouble("/mygen/r1_Vox",this);
-  r1Cmd->SetGuidance("Set the radius upper limit of the voxel in which the gammas are generated");
+  r1Cmd->SetGuidance("Set the radius upper limit of the voxel in which the photons are generated");
   r1Cmd->SetGuidance("[usage] /mygen/r1_Vox r1 mm");
   r1Cmd->SetGuidance(" r1 : r1 (where r1 is given in json) ");
   r1Cmd->SetRange("r1>0");
@@ -222,32 +230,60 @@ WCSimPrimaryGeneratorMessenger::WCSimPrimaryGeneratorMessenger(WCSimPrimaryGener
   r1Cmd->SetDefaultValue(1.0*CLHEP::mm);
 
   z0Cmd = new G4UIcmdWithADouble("/mygen/z0_Vox",this);
-  z0Cmd->SetGuidance("Set the z lower limit of the voxel in which the gammas are generated");
+  z0Cmd->SetGuidance("Set the z lower limit of the voxel in which the photons are generated");
   z0Cmd->SetGuidance("[usage] /mygen/z0_Vox z0 cm");
   z0Cmd->SetGuidance(" z0 : z0 (where z0 is given in json) ");
   z0Cmd->SetParameterName("z0",true);
   z0Cmd->SetDefaultValue(0.0*CLHEP::mm);
 
   z1Cmd = new G4UIcmdWithADouble("/mygen/z1_Vox",this);
-  z1Cmd->SetGuidance("Set the z upper limit of the voxel in which the gammas are generated");
+  z1Cmd->SetGuidance("Set the z upper limit of the voxel in which the photons are generated");
   z1Cmd->SetGuidance("[usage] /mygen/z1_Vox z1 cm");
   z1Cmd->SetGuidance(" z1 : z1 (where z1 is given in json) ");
   z1Cmd->SetParameterName("z1",true);
   z1Cmd->SetDefaultValue(1.0*CLHEP::mm);
 
   phi0Cmd = new G4UIcmdWithADouble("/mygen/phi0_Vox",this);
-  phi0Cmd->SetGuidance("Set the phi lower limit of the voxel in which the gammas are generated");
+  phi0Cmd->SetGuidance("Set the phi lower limit of the voxel in which the photons are generated");
   phi0Cmd->SetGuidance("[usage] /mygen/phi0_Vox phi0");
   phi0Cmd->SetGuidance(" phi0 : phi0 (where phi0 is given in json) ");
   phi0Cmd->SetParameterName("phi0",true);
   phi0Cmd->SetDefaultValue(0.0);
 
   phi1Cmd = new G4UIcmdWithADouble("/mygen/phi1_Vox",this);
-  phi1Cmd->SetGuidance("Set the phi upper limit of the voxel in which the gammas are generated");
+  phi1Cmd->SetGuidance("Set the phi upper limit of the voxel in which the photons are generated");
   phi1Cmd->SetGuidance("[usage] /mygen/phi1_Vox phi1");
   phi1Cmd->SetGuidance(" phi1 : phi1 (where phi1 is given in json) ");
   phi1Cmd->SetParameterName("phi1",true);
   phi1Cmd->SetDefaultValue(360.0);
+
+  fixphiCmd = new G4UIcmdWithADouble("/mygen/fixphidir",this);
+  fixphiCmd->SetGuidance("Set the phi direction of the photons");
+  fixphiCmd->SetGuidance("[usage] /mygen/fixphidir phi [deg]");
+  fixphiCmd->SetGuidance(" phi : phi (where phi is given in json) ");
+  fixphiCmd->SetParameterName("phidir",true);
+  fixphiCmd->SetDefaultValue(-999.0);
+
+  fixthetaCmd = new G4UIcmdWithADouble("/mygen/fixthetadir",this);
+  fixthetaCmd->SetGuidance("Set the theta direction of the photons");
+  fixthetaCmd->SetGuidance("[usage] /mygen/fixthetadir theta [deg]");
+  fixthetaCmd->SetGuidance(" theta : theta (where theta is given in json) ");
+  fixthetaCmd->SetParameterName("thetadir",true);
+  fixthetaCmd->SetDefaultValue(-999.0);
+
+  fixphiSigmaCmd = new G4UIcmdWithADouble("/mygen/fixphisigma",this);
+  fixphiSigmaCmd->SetGuidance("Set the range of phi for the direction of the photons");
+  fixphiSigmaCmd->SetGuidance("[usage] /mygen/fixphisigma phisigma [deg]");
+  fixphiSigmaCmd->SetGuidance(" phisigma : phisigma (where phisigma is given in json) ");
+  fixphiSigmaCmd->SetParameterName("phisigma",true);
+  fixphiSigmaCmd->SetDefaultValue(0.0);
+
+  fixthetaSigmaCmd = new G4UIcmdWithADouble("/mygen/fixthetasigma",this);
+  fixthetaSigmaCmd->SetGuidance("Set the range of theta for the direction of the photons");
+  fixthetaSigmaCmd->SetGuidance("[usage] /mygen/fixthetasigma thetasigma [deg]");
+  fixthetaSigmaCmd->SetGuidance(" thetasigma : thetasigma (where thetasigma is given in json) ");
+  fixthetaSigmaCmd->SetParameterName("thetasigma",true);
+  fixthetaSigmaCmd->SetDefaultValue(0.0);
 }
 
 WCSimPrimaryGeneratorMessenger::~WCSimPrimaryGeneratorMessenger()
@@ -270,6 +306,7 @@ WCSimPrimaryGeneratorMessenger::~WCSimPrimaryGeneratorMessenger()
   delete mPMTLEDIdCmd1;
   delete mPMTLEDIdCmd2;
 
+  delete nSubEventsCmd;
   delete nOptPhotonsCmd;
   delete r0Cmd;
   delete r1Cmd;
@@ -277,6 +314,10 @@ WCSimPrimaryGeneratorMessenger::~WCSimPrimaryGeneratorMessenger()
   delete phi1Cmd;
   delete z0Cmd;
   delete z1Cmd;
+  delete fixphiCmd;
+  delete fixthetaCmd;
+  delete fixphiSigmaCmd;
+  delete fixthetaSigmaCmd;
 }
 
 void WCSimPrimaryGeneratorMessenger::SetNewValue(G4UIcommand * command,G4String newValue)
@@ -749,6 +790,11 @@ void WCSimPrimaryGeneratorMessenger::SetNewValue(G4UIcommand * command,G4String 
              << ", dPhi = " << mPMTLEDIdCmd2->GetNew3VectorValue(newValue).z() << " deg" << G4endl;
     }
 
+  if (command==nSubEventsCmd)
+  {
+    myAction->SetNSubEvents(nSubEventsCmd->GetNewIntValue(newValue));
+  }
+
   if (command==nOptPhotonsCmd)
   {
      myAction->SetNPhotons(nOptPhotonsCmd->GetNewIntValue(newValue));
@@ -782,6 +828,26 @@ void WCSimPrimaryGeneratorMessenger::SetNewValue(G4UIcommand * command,G4String 
   if (command==z1Cmd)
   {
     myAction->SetVoxz1(z1Cmd->GetNewDoubleValue(newValue));
+  }
+
+  if (command==fixphiCmd)
+  {
+    myAction->FixPhiDir(fixphiCmd->GetNewDoubleValue(newValue));
+  }
+
+  if (command==fixthetaCmd)
+  {
+    myAction->FixThetaDir(fixthetaCmd->GetNewDoubleValue(newValue));
+  }
+
+  if (command==fixphiSigmaCmd)
+  {
+    myAction->FixPhiDirSigma(fixphiSigmaCmd->GetNewDoubleValue(newValue));
+  }
+
+  if (command==fixthetaSigmaCmd)
+  {
+    myAction->FixThetaDirSigma(fixthetaSigmaCmd->GetNewDoubleValue(newValue));
   }
 }
 

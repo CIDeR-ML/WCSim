@@ -34,13 +34,17 @@ G4double WCSimVoxGen::wavelength_binwidth = WCSimVoxGen::gammaWavelengths[1] - W
 //only considered gamma for now - J.Xia, Aug 24, 2024
 G4int    WCSimVoxGen::pdgids = 22;
 
-WCSimVoxGen::WCSimVoxGen(WCSimDetectorConstruction* detector, G4double energy, G4int nphotons, G4double rinputs[], G4double phiinputs[], G4double zinputs[]) :
+WCSimVoxGen::WCSimVoxGen(WCSimDetectorConstruction* detector, G4double energy, G4int nphotons, G4double rinputs[], G4double phiinputs[], G4double zinputs[], G4double phidir, G4double thetadir, G4double phidirsmear, G4double thetadirsmear):
                                            myDetector(detector),
                                            gEnergy(energy),
                                            nPhotons(nphotons),
                                            rRange({rinputs[0], rinputs[1]}),
                                            phiRange({phiinputs[0], phiinputs[1]}),
-                                           zRange({zinputs[0], zinputs[1]})
+                                           zRange({zinputs[0], zinputs[1]}),
+                                           phiDir(phidir),
+                                           thetaDir(thetadir),
+                                           phidirRange(phidirsmear),
+                                           thetadirRange(thetadirsmear)
 {
   wcsimdir = string(getenv("WCSIM_BUILD_DIR"))+"data/";
   
@@ -116,10 +120,18 @@ void WCSimVoxGen::GenRandomPosition(){
 }
 
 void WCSimVoxGen::GenRandomDirection(){
+     // Generate a random direction for the particle
      double phi = 2.0 * CLHEP::pi * G4UniformRand();
+     //if (phiDir >= 0. && phiDir <= 360.){
+     //double phi = ((phiDir-5.) + 10. * G4UniformRand()) * 2 * CLHEP::pi / 360.;
+     //}
 
      // Generate random cosine of the polar angle θ in [-1, 1]
      double cosTheta = 2.0 * G4UniformRand() - 1.0;
+     //if (thetaDir >= 0. && thetaDir <= 180.){
+     //double theta_degree = ((thetaDir-5.) + 10. * G4UniformRand()) * CLHEP::pi / 180.;
+     //double cosTheta = std::cos(theta_degree);
+     //}
      double sinTheta = std::sqrt(1.0 - cosTheta * cosTheta);
 
      // Convert to Cartesian coordinates
@@ -134,6 +146,26 @@ void WCSimVoxGen::GenRandomDirection(){
      }
 }
 
+void WCSimVoxGen::GenRandomDirection_wRange(){
+     // Generate a random direction for the particle
+     double phi = ((phiDir-.5*phidirRange) + phidirRange * G4UniformRand()) * 2 * CLHEP::pi / 360.;
+     double theta = ((thetaDir-.5*thetadirRange) + thetadirRange * G4UniformRand()) * CLHEP::pi / 180.;
+
+     double cosTheta = std::cos(theta);
+     double sinTheta = std::sqrt(1.0 - cosTheta * cosTheta);
+
+     // Convert to Cartesian coordinates
+     double x = sinTheta * std::cos(phi);
+     double y = sinTheta * std::sin(phi); // because the rotation later will flip the sign
+     double z = cosTheta;
+
+     direction = G4ThreeVector(x, y, z);
+
+     if (myDetector->GetIsNuPrism()){
+       direction.rotateX(-CLHEP::pi / 2);
+     }
+}
+
 void WCSimVoxGen::GenerateVox(G4Event* anEvent){
     //std::cout << "Energy: " << G4BestUnit(gEnergy, "Energy") << std::endl;
     myVoxGun->SetParticleEnergy(gEnergy);
@@ -143,11 +175,16 @@ void WCSimVoxGen::GenerateVox(G4Event* anEvent){
     myVoxGun->SetNumberOfParticles(nPhotons);
 
     GenRandomPosition();
-    GenRandomDirection();
+    if (apply_dir_range){
+      GenRandomDirection_wRange();
+    } else {
+      GenRandomDirection();
+    }
 
     // Configure the final properties of the particle
     myVoxGun->SetParticlePosition(position);
     myVoxGun->SetParticleMomentumDirection(direction);
+
     // Generate the primary vertex for the particle
     myVoxGun->GeneratePrimaryVertex(anEvent);
 }

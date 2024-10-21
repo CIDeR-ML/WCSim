@@ -23,7 +23,8 @@ class G4Event;
 class WCSimVoxGen
 {
   public:
-    WCSimVoxGen(WCSimDetectorConstruction* detector, G4double energy, G4int nphotons, G4double rRange[], G4double phiRange[], G4double zRange[]);
+    WCSimVoxGen(WCSimDetectorConstruction* detector, G4double energy, G4int nphotons, G4double rRange[], G4double phiRange[], G4double zRange[], G4double phidir = -999., G4double thetadir = -999.,
+                                                                                                                                                 G4double phidirsmear = 0., G4double thetadirsmear = 0.);
     ~WCSimVoxGen();
 
     // Initialise the AmBe generator
@@ -36,9 +37,12 @@ class WCSimVoxGen
 
     void GenRandomPosition();
     void GenRandomDirection();
+    void GenRandomDirection_wRange();
     G4double GenGammaEnergy();
     void SetNPhotonsPerEvent(G4int nPhotons);
 
+
+    void Set_Direction_flag(){apply_dir_range = true;}
     void SetGammaEnergy(G4double energy){gEnergy = energy;}
     G4ThreeVector GetPrimaryPosition(){ return position; }
     G4ThreeVector GetPrimaryDirection(){ return direction; }
@@ -52,7 +56,8 @@ class WCSimVoxGen
     //G4SPSEneDistribution* nEnergyDistFE;
     //G4SPSEneDistribution* nEnergyDistSE;
     WCSimDetectorConstruction *myDetector;
-    
+
+    bool apply_dir_range;
     // Variables for the initialisation of Vox generator parameters
     G4double gEnergy;
     G4int nPhotons;
@@ -60,6 +65,10 @@ class WCSimVoxGen
     G4double rRange[2];
     G4double phiRange[2];
     G4double zRange[2];
+    G4double phiDir;
+    G4double thetaDir;
+    G4double phidirRange;
+    G4double thetadirRange;
 
     G4ThreeVector position;
     G4ThreeVector direction;

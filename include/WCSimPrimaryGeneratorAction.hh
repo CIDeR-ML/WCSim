@@ -123,10 +123,15 @@ private:
   WCSimAmBeGen* AmBeGen;
   // Vox Generator
   WCSimVoxGen* VoxGen;
+  G4int nSubEvents;
   G4int nOptPhotons;
   G4double rRange[2];
   G4double phiRange[2];
   G4double zRange[2];
+  G4double phiDir;
+  G4double thetaDir;
+  G4double phiDirSmear;
+  G4double thetaDirSmear;
   TH1D *hQE_profile = nullptr;
 
   // IBD generator
@@ -240,6 +245,7 @@ private:
 
   inline void SetVoxEvtGenerator(G4bool choice) { useVoxEvt = choice; }
   inline G4bool IsUsingVoxEvtGenerator()  { return useVoxEvt; }
+  inline void SetNSubEvents(G4int n) { nSubEvents = n; }
   inline void SetNPhotons(G4int newvalue) { nOptPhotons = newvalue; }
   inline void SetVoxr0(G4double r0) { rRange[0] = r0; }
   inline void SetVoxr1(G4double r1) { rRange[1] = r1; }
@@ -247,6 +253,10 @@ private:
   inline void SetVoxphi1(G4double phi1) { phiRange[1] = phi1; }
   inline void SetVoxz0(G4double z0) { zRange[0] = z0; }
   inline void SetVoxz1(G4double z1) { zRange[1] = z1; }
+  inline void FixPhiDir(G4double phi) { phiDir = phi;}
+  inline void FixPhiDirSigma(G4double phi) { phiDirSmear = phi;}
+  inline void FixThetaDir(G4double theta) { thetaDir = theta;}
+  inline void FixThetaDirSigma(G4double theta) { thetaDirSmear = theta;}
 
 
   inline TFile* GetInputRootrackerFile(){ return fInputRootrackerFile;}
