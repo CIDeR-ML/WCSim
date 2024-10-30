@@ -254,56 +254,61 @@ int main(int argc, char *argv[])
     // Read the event from the tree into the WCSimRootEvent instance
     tree->GetEntry(ievent);      
     wcsimrootevent = wcsimrootsuperevent->GetTrigger(0);
-    //setvtx in wcsim converts assumes mm
     //weird coordinates to match the WCSim convention
-    double VtxX = wcsimrootevent->GetVtx(0)*10;
-    double VtxY = -wcsimrootevent->GetVtx(2)*10;
-    double VtxZ = wcsimrootevent->GetVtx(1)*10;
+    TClonesArray *nhits = wcsimrootevent->GetCherenkovHitTimes();
+    if (!nhits)
+      continue;
+    for (int i = 0; i < nhits->GetEntries(); i++){
+      WCSimRootCherenkovHitTime *hit = (WCSimRootCherenkovHitTime*)nhits->At(i);
+      double VtxX = hit->GetPhotonStartPos(0)*10;
+      double VtxY = hit->GetPhotonStartPos(2)*10;
+      double VtxZ = hit->GetPhotonStartPos(1)*10;
 
-    double R = sqrt(VtxX*VtxX + VtxY*VtxY);
-    double Phi = std::atan2(VtxY, VtxX)*180./TMath::Pi();
-    if (Phi < 0){
-      Phi += 360.;
-    }
-    
-    vec_r.push_back(R);
-    vec_phi.push_back(Phi);
-    vec_z.push_back(VtxZ);
+      double R = sqrt(VtxX*VtxX + VtxY*VtxY);
+      double Phi = std::atan2(VtxY, VtxX)*180./TMath::Pi();
+      if (Phi < 0){
+        Phi += 360.;
+      }
 
-    if (!skip_plotting){
-      hVox[0]->Fill(R);
-      hVox[1]->Fill(Phi);
-      hVox[2]->Fill(VtxZ);
-    }
-    
-    // Now read the tracks in the event
-    // Loop through elements in the TClonesArray of WCSimTracks
-    for (int itrack=0; itrack<1; itrack++)
-    {
-      TObject *element = (wcsimrootevent->GetTracks())->At(itrack);
-      if(!element)
-	continue;
-      WCSimRootTrack *wcsimroottrack = dynamic_cast<WCSimRootTrack*>(element);
+      vec_r.push_back(R);
+      vec_phi.push_back(Phi);
+      vec_z.push_back(VtxZ);
 
-      double dirX = wcsimroottrack->GetDir(0);
-      double dirY = wcsimroottrack->GetDir(1);
-      double dirZ = wcsimroottrack->GetDir(2);
+      if (!skip_plotting){
+        hVox[0]->Fill(R);
+        hVox[1]->Fill(Phi);
+        hVox[2]->Fill(VtxZ);
+      }
+
+      double dirX = hit->GetPhotonStartDir(0);
+      double dirY = hit->GetPhotonStartDir(1);
+      double dirZ = hit->GetPhotonStartDir(2);
 
       G4ThreeVector dir = G4ThreeVector(dirX, -dirZ, dirY);
       double cosZ = std::cos(dir.theta());
       double dirP = dir.phi()*180./TMath::Pi() + 180.;
-      
-      double eventE = wcsimroottrack->GetE()/1.E+6; // eV to MeV
-      double lambda = 1.240E-3/eventE;
-
-      hlambda->Fill(lambda);
-
       vec_dirp.push_back(dirP);
       vec_cosz.push_back(cosZ);
 
       if (!skip_plotting){
         hDir->Fill(dirP, cosZ);
       }
+
+    }
+
+    // Now read the tracks in the event
+    // Loop through elements in the TClonesArray of WCSimTracks
+    for (int itrack=0; itrack<1; itrack++)
+    {
+      TObject *element = (wcsimrootevent->GetTracks())->At(itrack);
+      if(!element)
+	    continue;
+      WCSimRootTrack *wcsimroottrack = dynamic_cast<WCSimRootTrack*>(element);
+      
+      double eventE = wcsimroottrack->GetE()/1.E+6; // eV to MeV
+      double lambda = 1.240E-3/eventE;
+
+      hlambda->Fill(lambda);
 
     }  // itrack // End of loop over tracks
 

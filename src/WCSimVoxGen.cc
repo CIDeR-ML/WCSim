@@ -104,6 +104,20 @@ G4double WCSimVoxGen::GenGammaEnergy(){
     
     return energy;
 }
+/*
+void WCSimVoxGen::GetVoxPosition(){
+    // Get the position of the voxel from
+    // (r, phi, z)
+    G4double phi = 0.5*(phiRange[0]+phiRange[1]);
+    G4double r = 0.5*(rRange[0] + rRange[1]);
+    G4double cos_phi_rad = std::cos(phi); //already in radians
+    G4double sin_phi_rad = std::sin(phi);
+    G4double z = 0.5*(zRange[0] + zRange[1]);
+    position_vox = G4ThreeVector(r*cos_phi_rad, r*sin_phi_rad, z); // because the rotation later will flip the sign
+    if (myDetector->GetIsNuPrism()){
+      position_vox.rotateX(-CLHEP::pi / 2);
+    }
+}*/
 
 void WCSimVoxGen::GenRandomPosition(){
      // Generate a random position for the particle

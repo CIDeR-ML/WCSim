@@ -1,5 +1,5 @@
-R__LOAD_LIBRARY(/sdf/home/j/junjie/sw/WCSim/WCSim_build/mydir/src/libWCSimRoot.so)
-
+//R__LOAD_LIBRARY(/sdf/home/j/junjie/sw/WCSim/WCSim_build/mydir/src/libWCSimRoot.so)
+R__LOAD_LIBRARY(/src/WCSim/build/lib/libWCSimRoot.so)
 void EventDisplay(const char * fname)
 {
     gStyle->SetOptStat(0);
