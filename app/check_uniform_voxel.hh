@@ -32,9 +32,10 @@ TH1D* hSpec;
 TH1D* hVox[3];
 TH2D* hDir;
 
-std::vector<string> keys = {"r0", "r1", "phi0", "phi1", "z0", "z1", "criterion", "wrapup_file"};
+std::vector<string> keys = {"r0", "r1", "phi0", "phi1", "z0", "z1", "phidir0", "phidir1", "thdir0", "thdir1", "criterion", "wrapup_file"};
 std::unordered_map<std::string, double> variables;
 std::unordered_map<std::string, double> check_values;
+std::unordered_map<std::string, bool> range_values;
 
 //Functions
 double KS_test(std::vector<double> testvec, double start, double stop);

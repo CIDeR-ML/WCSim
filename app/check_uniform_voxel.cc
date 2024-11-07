@@ -24,6 +24,12 @@
 #include "check_uniform_voxel.hh"
 
 using namespace std;
+bool areElementsInRange(const std::vector<double>& vec, double a, double b) {
+    return std::all_of(vec.begin(), vec.end(), [a, b](double x) {
+        return x >= a && x <= b;
+    });
+}
+
 //unbinned KS test on the uniformity of generated data points
 double KS_test(std::vector<double> testvec, double start, double stop){
   
@@ -195,7 +201,7 @@ int main(int argc, char *argv[])
     hVox[0]   = new TH1D("r", "r", 20, variables["r0"]-20., variables["r1"]+20.);
     hVox[1]   = new TH1D("phi", "phi", 20, variables["phi0"]-5., variables["phi1"]+5.);
     hVox[2]   = new TH1D("z", "z", 20, variables["z0"]-20., variables["z1"]+20.);
-    hDir      = new TH2D("dir", "dir", 36, 0, 360., 20, -1, 1.);
+    hDir      = new TH2D("dir", "dir", 36, 0, 360., 18, 0., 180.);
     hDir->SetDirectory(0);
     for (int i = 0; i < 3; i++){
         hVox[i]->SetDirectory(0);
@@ -211,7 +217,7 @@ int main(int argc, char *argv[])
   std::vector<double> vec_phi;
   std::vector<double> vec_z;
   std::vector<double> vec_dirp;
-  std::vector<double> vec_cosz;
+  std::vector<double> vec_dirz;
   
   // Get the a pointer to the tree from the file
   TTree *tree = (TTree*)file->Get("wcsimT");
@@ -260,9 +266,9 @@ int main(int argc, char *argv[])
       continue;
     for (int i = 0; i < nhits->GetEntries(); i++){
       WCSimRootCherenkovHitTime *hit = (WCSimRootCherenkovHitTime*)nhits->At(i);
-      double VtxX = hit->GetPhotonStartPos(0)*10;
-      double VtxY = -hit->GetPhotonStartPos(2)*10;
-      double VtxZ = hit->GetPhotonStartPos(1)*10;
+      double VtxX = hit->GetPhotonStartPos(0);
+      double VtxY = -hit->GetPhotonStartPos(2);
+      double VtxZ = hit->GetPhotonStartPos(1);
 
       double R = sqrt(VtxX*VtxX + VtxY*VtxY);
       double Phi = std::atan2(VtxY, VtxX)*180./TMath::Pi();
@@ -285,13 +291,13 @@ int main(int argc, char *argv[])
       double dirZ = hit->GetPhotonStartDir(2);
 
       G4ThreeVector dir = G4ThreeVector(dirX, -dirZ, dirY);
-      double cosZ = std::cos(dir.theta());
-      double dirP = dir.phi()*180./TMath::Pi() + 180.;
+      double dirz = dir.theta()*180./TMath::Pi();
+      double dirP = dir.phi()*360./2/TMath::Pi();
       vec_dirp.push_back(dirP);
-      vec_cosz.push_back(cosZ);
+      vec_dirz.push_back(dirz);
 
       if (!skip_plotting){
-        hDir->Fill(dirP, cosZ);
+        hDir->Fill(dirP, dirz);
       }
 
     }
@@ -332,6 +338,7 @@ int main(int argc, char *argv[])
 
   int output = 1;
 
+  range_values["E_spectrum"] = true;
   if (all_Chi2){
     check_values["E_spectrum"] = Chi2_test(hSpec, hlambda);
   }
@@ -340,13 +347,31 @@ int main(int argc, char *argv[])
     check_values["vtx_r"] = KS_test(vec_r, variables["r0"], variables["r1"]);
     check_values["vtx_phi"] = KS_test(vec_phi, variables["phi0"], variables["phi1"]);
     check_values["vtx_z"] = KS_test(vec_z, variables["z0"], variables["z1"]);
-    check_values["dirphi"] = KS_test(vec_dirp, 0., 360.);
-    check_values["cosz"] = KS_test(vec_cosz, -1., 1.);        
+    check_values["dirphi"] = KS_test(vec_dirp, variables["phdir0"], variables["phdir1"]);
+    check_values["dirz"] = KS_test(vec_dirz, variables["thdir0"], variables["thdir1"]);
+
+    range_values["vtx_r"] = areElementsInRange(vec_r, variables["r0"], variables["r1"]);
+    range_values["vtx_phi"] = areElementsInRange(vec_phi, variables["phi0"], variables["phi1"]);
+    range_values["vtx_z"] = areElementsInRange(vec_z, variables["z0"], variables["z1"]);
+    range_values["dirphi"] = areElementsInRange(vec_dirp, variables["phidir0"], variables["phidir1"]);
+    range_values["dirz"] = areElementsInRange(vec_dirz, variables["thdir0"], variables["thdir1"]);
   }
-  
+
+  //std::cout << variables["r0"] << " " << variables["r1"] << " " << *std::min_element(vec_r.begin(), vec_r.end()) << " " << *std::max_element(vec_r.begin(), vec_r.end()) << std::endl;
+  //std::cout << variables["z0"] << " " << variables["z1"] << " " << *std::min_element(vec_z.begin(), vec_z.end()) << " " << *std::max_element(vec_z.begin(), vec_z.end()) << std::endl;
+  //std::cout << variables["phi0"] << " " << variables["phi1"] << " " << *std::min_element(vec_phi.begin(), vec_phi.end()) << " " << *std::max_element(vec_phi.begin(), vec_phi.end()) << std::endl;
+  //std::cout << variables["phidir0"] << " " << variables["phidir1"] << " " << *std::min_element(vec_dirp.begin(), vec_dirp.end()) << " " << *std::max_element(vec_dirp.begin(), vec_dirp.end()) << std::endl;
+
   for (auto i = check_values.begin(); i != check_values.end(); i++){
     //output *= (i->second > variables["criterion"] ? 1.: 0.);
-    std::cout << i->first << " = " << i->second << std::endl;
+    if (range_values[i->first]) {
+        std::cout << "All data points of " << i->first << " are in the given range." << std::endl;
+    }
+    else {
+        std::cout << "Some data points of " << i->first << " are not in the given range. Need to RERUN!" << std::endl;
+    }
+
+    //std::cout << i->first << " = " << i->second << std::endl;
     //if (output < 1){
     //  cerr << i->first << " has failed because the checked value " << i->second << " is less than the threshold " << variables["criterion"] << endl;
     // return output;
