@@ -261,7 +261,7 @@ int main(int argc, char *argv[])
     for (int i = 0; i < nhits->GetEntries(); i++){
       WCSimRootCherenkovHitTime *hit = (WCSimRootCherenkovHitTime*)nhits->At(i);
       double VtxX = hit->GetPhotonStartPos(0)*10;
-      double VtxY = hit->GetPhotonStartPos(2)*10;
+      double VtxY = -hit->GetPhotonStartPos(2)*10;
       double VtxZ = hit->GetPhotonStartPos(1)*10;
 
       double R = sqrt(VtxX*VtxX + VtxY*VtxY);
