@@ -32,6 +32,8 @@ ClassImp(WCSimRootEvent)
 #endif
 //#define DEBUG
 
+int WCSimRootEvent::fNumberOfWCSimRootEventCreated = 0;
+
 //TClonesArray* WCSimRootTrigger::fgTracks = 0;
 //
 //TClonesArray* WCSimRootTrigger::fgCherenkovHits = 0;
@@ -788,6 +790,16 @@ WCSimRootEvent::WCSimRootEvent()
   // it will be lost
   fEventList = 0;
   Current = 0;
+  
+  fNumberOfWCSimRootEventCreated++;
+  
+  if(fNumberOfWCSimRootEventCreated % 1000 == 0) {
+    std::cerr << std::endl << std::endl
+	      << "***********************************************************" << std::endl
+	      <<"Created WCSimRootEvent " << fNumberOfWCSimRootEventCreated << ". There is a memory leak when doing TTree::GetEntry() when reading files. It is also presumed that filling is leaky. It is strongly recommended not to generate or analyse O(1000) events in a single job" << std::endl
+	      << "***********************************************************" << std::endl
+	      << std::endl << std::endl;
+  }
 }
 
 //_____________________________________________________________________________
@@ -808,6 +820,29 @@ void WCSimRootEvent::Initialize()
   Current = 0;
 }
 
+//_____________________________________________________________________________
+void WCSimRootEvent::ReInitialize() {
+  // need to remove all subevents at the end, or they just get added anyway...
+  for ( int i = fEventList->GetLast() ; i>=1 ; i--) {
+    //      G4cout << "removing element # " << i << "...";
+    WCSimRootTrigger* tmp = 
+      dynamic_cast<WCSimRootTrigger*>(fEventList->RemoveAt(i));
+    delete tmp;
+    //G4cout <<"done !\n";
+  }
+  Current = 0;
+  WCSimRootTrigger* tmp = dynamic_cast<WCSimRootTrigger*>( (*fEventList)[0]);
+  tmp->Clear();
+
+  if(fNumberOfWCSimRootEventCreated % 1000 == 0) {
+    std::cerr << std::endl << std::endl
+	      << "***********************************************************" << std::endl
+	      <<"Created WCSimRootEvent " << fNumberOfWCSimRootEventCreated << ". There is a memory leak when doing TTree::GetEntry() when reading files. It is also presumed that filling is leaky. It is strongly recommended not to generate or analyse O(1000) events in a single job" << std::endl
+	      << "***********************************************************" << std::endl
+	      << std::endl << std::endl;
+  }
+  fNumberOfWCSimRootEventCreated++;
+}
 
 //_____________________________________________________________________________
 WCSimRootEvent::~WCSimRootEvent()

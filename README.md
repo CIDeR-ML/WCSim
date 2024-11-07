@@ -229,6 +229,8 @@ WCSim WCSim.mac macros/tuning_parameters.mac
 
 `WCSim.mac` is well commented. Take a look inside (and also at other `.mac` files in `/macros/`) for the various options you can use to run WCSim
 
+> [!WARNING]
+> There is a memory leak when doing TTree::GetEntry() when reading files. It is also presumed that filling is leaky. It is strongly recommended not to generate or analyse O(1000) events in a single job
 
 ## Analysing the output of WCSim
 
@@ -239,6 +241,9 @@ There are a few example scripts inside `sample-root-scripts/`
   * Compile it using the `Makefile` in `sample-root-scripts/` (i.e. run `make` from that folder)
   * Execute it using `Analyzer.sh` in `sample-root-scripts/` (i.e. run `./Analyzer.sh` from that folder)
 * For info about the other scripts, see the README inside `sample-root-scripts/`
+
+> [!WARNING]
+> There is a memory leak when doing TTree::GetEntry() when reading files. It is also presumed that filling is leaky. It is strongly recommended not to generate or analyse O(1000) events in a single job
 
 ## Color Convention for visualization used in `WCSimVismanager.cc`
 

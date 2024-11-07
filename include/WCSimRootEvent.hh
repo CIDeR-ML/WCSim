@@ -655,24 +655,15 @@ public:
   */
   void Initialize();
 
-  void ReInitialize() { // need to remove all subevents at the end, or they just get added anyway...
-    for ( int i = fEventList->GetLast() ; i>=1 ; i--) {
-      //      G4cout << "removing element # " << i << "...";
-      WCSimRootTrigger* tmp = 
-	dynamic_cast<WCSimRootTrigger*>(fEventList->RemoveAt(i));
-      delete tmp;
-      //G4cout <<"done !\n";
-    }
-    Current = 0;
-    WCSimRootTrigger* tmp = dynamic_cast<WCSimRootTrigger*>( (*fEventList)[0]);
-    tmp->Clear();
-  }
+  void ReInitialize();
+  static int fNumberOfWCSimRootEventCreated; //!< Count of the number of calls to the WCSimRootEvent constructor & ReInitalise()
 
 private:
   //std::vector<WCSimRootTrigger*> fEventList;
   TObjArray* fEventList; //!< Array of WCSimRootTrigger
   Int_t Current;                      //!               means transient, not writable to file
-  ClassDef(WCSimRootEvent,3)
+
+  ClassDef(WCSimRootEvent,4)
 
 };
 

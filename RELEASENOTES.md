@@ -5,6 +5,43 @@ This file contains the release notes for each version of WCSim. Release notes ca
 Recent updates
 *************************************************************
 
+
+*************************************************************
+30/10/2024: Notes for v1.12.18
+*************************************************************
+New release after #488. No physics output change, just a difference in the geofile/WCSimRootGeom output
+
+Bug fix
+* Pull request #481 #482 @kmtsui: Bug fix for trigger algorithm when encountering negative hit times
+* Pull request #488 @kmtsui: Fix cylLocation for WCTE & nuPRISM detectors
+
+Documentation
+* Pull request #483 @tdealtry #489 @gondiaz: There is a memory leak when reading WCSim files. Warn people not to produce or analyse more than O(1000) events per job
+
+*************************************************************
+01/10/2024: Notes for v1.12.17
+*************************************************************
+New release due to updated hit times for WCTE
+
+Bug fix
+* Pull request #480 @kmtsui: Bug fix for WCTE PMTs: for high charge PMT hit, HitTimeSmearing evaluation by TSpline was invalid, now set an upper limit on Q based on the input data range
+
+*************************************************************
+30/09/2024: Notes for v1.12.16
+*************************************************************
+
+New release due to updated geometry for WCTE
+
+Update
+* Pull request #472 @kmtsui: Update WCTE PMT table
+* Pull request #474 @tdealtry: Remove hard exit in `WCSimEnumerations::ProcessTypeStringToEnum()`
+* Pull request #479 @kmtsui: Update ex-situ 3" PMT design: include a collar
+* Pull request #479 @kmtsui: WCTE geometry update: use in-situ mPMTs for the 4 FD mPMT slots
+
+Bug fix
+* Pull request #475 @tdealtry: Fix bug seen in `WCSimPrimaryGeneratorMessenger` constructor which errors on a modern compiler
+* Pull request #472 @DiegoCostas97: Fix bug in `WCSimAmBeGen` constructor getting `$WCSIM_BUILD_DIR` incorrectly
+
 *************************************************************
 29/08/2024: Notes for v1.12.15
 *************************************************************

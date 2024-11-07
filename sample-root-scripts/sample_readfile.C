@@ -42,6 +42,10 @@ int sample_readfile(const char *filename="../wcsim.root", TString events_tree_na
   
   // Get the a pointer to the tree from the file
   TTree *tree = (TTree*)file->Get("wcsimT");
+  tree->SetBranchStatus("wcsimrootevent", 0);
+  tree->SetBranchStatus("wcsimrootevent2", 0);
+  tree->SetBranchStatus("wcsimrootevent_OD", 0);
+  tree->SetBranchStatus(events_tree_name, 1);
   
   // Get the number of events
   const long nevent = tree->GetEntries();
