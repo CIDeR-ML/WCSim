@@ -5,6 +5,17 @@ This file contains the release notes for each version of WCSim. Release notes ca
 Recent updates
 *************************************************************
 
+*************************************************************
+22/11/2024: Notes for v1.12.19
+*************************************************************
+New release after WCTE geometry change in #491
+
+New feature
+* Pull request #491 @kmtsui: Add the beam pipe & camera housing to the WCTE geometry
+* Pull request #490 @tdealtry: New CI for testing running with Geant4.10.5.1
+
+Documentation
+* Pull request #492 @tdealtry: Make it clear that the default dark rate for the HK FD 20" Box & Line PMTs is 4.2 kHz
 
 *************************************************************
 30/10/2024: Notes for v1.12.18
