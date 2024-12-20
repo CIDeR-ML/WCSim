@@ -194,26 +194,39 @@ void EventDisplay(const char * fname)
         target_y += -BeamDir.x(); target_x += BeamDir.z(); target_z += BeamDir.y();
     }
     double evtx, evty;
-    if (fabs(vtx_z)<barrelCut)
-    {
-        double th = atan2(vtx_y,vtx_x);
+    // if (fabs(vtx_z)<barrelCut)
+    // {
+    //     double th = atan2(vtx_y,vtx_x);
 
-        evtx = -max_r*th;
-        evty = vtx_z;
-    }
-    else if (vtx_z>barrelCut)
-    {
-        evtx = -vtx_y;
-        evty = max_z+max_r-vtx_x;
-    }
-    else
-    {
-        evtx = -vtx_y;
-        evty = -max_z-max_r+vtx_x;
-    }
-    TMarker m1(evtx,evty,29);
-    m1.SetMarkerColor(kRed);
-    m1.Draw();
+    //     evtx = -max_r*th;
+    //     evty = vtx_z;
+    // }
+    // else if (vtx_z>barrelCut)
+    // {
+    //     evtx = -vtx_y;
+    //     evty = max_z+max_r-vtx_x;
+    // }
+    // else
+    // {
+    //     evtx = -vtx_y;
+    //     evty = -max_z-max_r+vtx_x;
+    // }
+    double th = atan2(vtx_y,vtx_x);
+    evtx = -max_r*th;
+    evty = vtx_z;
+    TMarker m1b(evtx,evty,29);
+    m1b.SetMarkerColor(kRed);
+    m1b.Draw();
+    evtx = -vtx_y;
+    evty = max_z+max_r-vtx_x;
+    TMarker m1u(evtx,evty,29);
+    m1u.SetMarkerColor(kRed);
+    m1u.Draw();
+    evtx = -vtx_y;
+    evty = -max_z-max_r+vtx_x;
+    TMarker m1d(evtx,evty,29);
+    m1d.SetMarkerColor(kRed);
+    m1d.Draw();
     if (fabs(target_z)<barrelCut)
     {
         double th = atan2(target_y,target_x);
